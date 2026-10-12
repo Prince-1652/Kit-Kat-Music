@@ -1,6 +1,6 @@
 # Dynamic Island Music Player Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Build an ultra-lightweight, Material 3 dynamic island desktop music player for Windows powered by Tauri v2, Rust, Vanilla TypeScript, and `yt-dlp`.
 
@@ -24,7 +24,7 @@
 - Create: `src-tauri/src/main.rs`
 - Create: `src-tauri/src/lib.rs`
 
-- [ ] **Step 1: Create frontend configuration files (`package.json`, `tsconfig.json`, `vite.config.ts`, `index.html`)**
+- [x] **Step 1: Create frontend configuration files (`package.json`, `tsconfig.json`, `vite.config.ts`, `index.html`)**
 
 `package.json`:
 ```json
@@ -114,7 +114,7 @@ export default defineConfig({
 </html>
 ```
 
-- [ ] **Step 2: Create Tauri v2 configuration and Rust files**
+- [x] **Step 2: Create Tauri v2 configuration and Rust files**
 
 `src-tauri/Cargo.toml`:
 ```toml
@@ -235,12 +235,12 @@ pub fn run() {
 }
 ```
 
-- [ ] **Step 3: Run npm install and verify project builds**
+- [x] **Step 3: Run npm install and verify project builds**
 
 Run: `npm install`
 Expected: Node modules installed cleanly.
 
-- [ ] **Step 4: Commit scaffolding**
+- [x] **Step 4: Commit scaffolding**
 
 ```bash
 git add .
@@ -255,7 +255,7 @@ git commit -m "chore: scaffold Tauri v2 and Vite project structure"
 - Create: `src/core/anim.ts`
 - Test: `tests/anim.test.mjs`
 
-- [ ] **Step 1: Write test for Spring physics engine**
+- [x] **Step 1: Write test for Spring physics engine**
 
 `tests/anim.test.mjs`:
 ```js
@@ -300,12 +300,12 @@ test("Spring reaches target smoothly without NaN", () => {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it passes**
+- [x] **Step 2: Run test to verify it passes**
 
 Run: `node --test tests/anim.test.mjs`
 Expected: PASS
 
-- [ ] **Step 3: Implement `src/core/anim.ts`**
+- [x] **Step 3: Implement `src/core/anim.ts`**
 
 `src/core/anim.ts`:
 ```ts
@@ -354,7 +354,7 @@ export class Spring {
 }
 ```
 
-- [ ] **Step 4: Commit animation engine**
+- [x] **Step 4: Commit animation engine**
 
 ```bash
 git add src/core/anim.ts tests/anim.test.mjs
@@ -369,7 +369,7 @@ git commit -m "feat: add spring animation physics solver"
 - Create: `src/core/icons.ts`
 - Create: `src/style.css`
 
-- [ ] **Step 1: Implement `src/core/icons.ts` with pure Lucide SVGs**
+- [x] **Step 1: Implement `src/core/icons.ts` with pure Lucide SVGs**
 
 `src/core/icons.ts`:
 ```ts
@@ -406,7 +406,7 @@ export function renderIcon(name: IconName, className = "icon"): string {
 }
 ```
 
-- [ ] **Step 2: Implement `src/style.css` with exact Material 3 design tokens**
+- [x] **Step 2: Implement `src/style.css` with exact Material 3 design tokens**
 
 `src/style.css`:
 ```css
@@ -506,7 +506,7 @@ body {
 }
 ```
 
-- [ ] **Step 3: Commit tokens and icons**
+- [x] **Step 3: Commit tokens and icons**
 
 ```bash
 git add src/core/icons.ts src/style.css
@@ -521,7 +521,7 @@ git commit -m "feat: add Lucide SVG icon registry and Material 3 CSS tokens"
 - Create: `src-tauri/src/ytdlp.rs`
 - Modify: `src-tauri/src/lib.rs`
 
-- [ ] **Step 1: Implement `src-tauri/src/ytdlp.rs`**
+- [x] **Step 1: Implement `src-tauri/src/ytdlp.rs`**
 
 `src-tauri/src/ytdlp.rs`:
 ```rust
@@ -725,7 +725,7 @@ pub async fn extract_stream_url(video_id: String) -> Result<StreamPayload, Strin
 }
 ```
 
-- [ ] **Step 2: Register commands in `src-tauri/src/lib.rs`**
+- [x] **Step 2: Register commands in `src-tauri/src/lib.rs`**
 
 ```rust
 pub mod ytdlp;
@@ -751,12 +751,12 @@ async fn get_stream_url(video_id: String) -> Result<ytdlp::StreamPayload, String
 }
 ```
 
-- [ ] **Step 3: Run `cargo check` to verify compilation**
+- [x] **Step 3: Run `cargo check` to verify compilation**
 
 Run: `cd src-tauri && cargo check`
 Expected: Compiles with 0 errors.
 
-- [ ] **Step 4: Commit yt-dlp backend**
+- [x] **Step 4: Commit yt-dlp backend**
 
 ```bash
 git add src-tauri/src/ytdlp.rs src-tauri/src/lib.rs
@@ -771,7 +771,7 @@ git commit -m "feat: implement yt-dlp status check, installer, search and stream
 - Create: `src-tauri/src/window.rs`
 - Modify: `src-tauri/src/lib.rs`
 
-- [ ] **Step 1: Implement `src-tauri/src/window.rs`**
+- [x] **Step 1: Implement `src-tauri/src/window.rs`**
 
 `src-tauri/src/window.rs`:
 ```rust
@@ -875,7 +875,7 @@ fn run_cursor_poll(window: WebviewWindow) {
 }
 ```
 
-- [ ] **Step 2: Connect `WindowManager` state and `update_island_shape` in `src-tauri/src/lib.rs`**
+- [x] **Step 2: Connect `WindowManager` state and `update_island_shape` in `src-tauri/src/lib.rs`**
 
 ```rust
 #[tauri::command]
@@ -895,12 +895,12 @@ fn update_island_shape(
 }
 ```
 
-- [ ] **Step 3: Run `cargo check` to verify compilation**
+- [x] **Step 3: Run `cargo check` to verify compilation**
 
 Run: `cd src-tauri && cargo check`
 Expected: Compiles with 0 errors.
 
-- [ ] **Step 4: Commit Win32 hit-testing module**
+- [x] **Step 4: Commit Win32 hit-testing module**
 
 ```bash
 git add src-tauri/src/window.rs src-tauri/src/lib.rs
@@ -915,7 +915,7 @@ git commit -m "feat: add Win32 cursor polling and click-through management"
 - Create: `src/core/audio.ts`
 - Create: `src/core/media_session.ts`
 
-- [ ] **Step 1: Implement `src/core/audio.ts`**
+- [x] **Step 1: Implement `src/core/audio.ts`**
 
 `src/core/audio.ts`:
 ```ts
@@ -1018,7 +1018,7 @@ export class AudioEngine {
 }
 ```
 
-- [ ] **Step 2: Implement `src/core/media_session.ts`**
+- [x] **Step 2: Implement `src/core/media_session.ts`**
 
 `src/core/media_session.ts`:
 ```ts
@@ -1051,7 +1051,7 @@ export function updateMediaMetadata(track: AudioTrack): void {
 }
 ```
 
-- [ ] **Step 3: Commit audio and media session modules**
+- [x] **Step 3: Commit audio and media session modules**
 
 ```bash
 git add src/core/audio.ts src/core/media_session.ts
@@ -1066,7 +1066,7 @@ git commit -m "feat: implement HTML5 audio streaming engine with live visualizer
 - Create: `src/island/fsm.ts`
 - Create: `src/island/view.ts`
 
-- [ ] **Step 1: Implement `src/island/fsm.ts`**
+- [x] **Step 1: Implement `src/island/fsm.ts`**
 
 `src/island/fsm.ts`:
 ```ts
@@ -1113,7 +1113,7 @@ export class IslandFSM {
 }
 ```
 
-- [ ] **Step 2: Implement `src/island/view.ts`**
+- [x] **Step 2: Implement `src/island/view.ts`**
 
 `src/island/view.ts`:
 ```ts
@@ -1191,7 +1191,7 @@ export class IslandView {
 }
 ```
 
-- [ ] **Step 3: Commit state machine and morphing view**
+- [x] **Step 3: Commit state machine and morphing view**
 
 ```bash
 git add src/island/fsm.ts src/island/view.ts
@@ -1207,7 +1207,7 @@ git commit -m "feat: implement Island FSM and spring-based morphing view"
 - Create: `src/player/controls.ts`
 - Create: `src/main.ts`
 
-- [ ] **Step 1: Implement `src/player/search.ts`**
+- [x] **Step 1: Implement `src/player/search.ts`**
 
 `src/player/search.ts`:
 ```ts
@@ -1275,7 +1275,7 @@ export class SearchManager {
 }
 ```
 
-- [ ] **Step 2: Implement `src/player/controls.ts`**
+- [x] **Step 2: Implement `src/player/controls.ts`**
 
 `src/player/controls.ts`:
 ```ts
@@ -1319,7 +1319,7 @@ export class PlayerControls {
 }
 ```
 
-- [ ] **Step 3: Wire full app in `src/main.ts`**
+- [x] **Step 3: Wire full app in `src/main.ts`**
 
 `src/main.ts`:
 ```ts
@@ -1429,7 +1429,7 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 ```
 
-- [ ] **Step 4: Commit UI and integration modules**
+- [x] **Step 4: Commit UI and integration modules**
 
 ```bash
 git add src/player/search.ts src/player/controls.ts src/main.ts
@@ -1440,17 +1440,17 @@ git commit -m "feat: implement debounced search, controls, and main app bootstra
 
 ### Task 9: Build Verification & Polish
 
-- [ ] **Step 1: Run frontend build check**
+- [x] **Step 1: Run frontend build check**
 
 Run: `npm run build`
 Expected: TypeScript check passes, Vite bundle created with 0 errors.
 
-- [ ] **Step 2: Run Rust build check**
+- [x] **Step 2: Run Rust build check**
 
 Run: `cd src-tauri && cargo check`
 Expected: Cargo check passes with 0 errors.
 
-- [ ] **Step 3: Commit verified implementation**
+- [x] **Step 3: Commit verified implementation**
 
 ```bash
 git add .
