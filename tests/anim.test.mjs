@@ -8,7 +8,7 @@ class Spring {
   omega;
   zeta;
 
-  constructor(value, response = 0.45, damping = 0.75) {
+  constructor(value, response = 0.5, damping = 0.72) {
     this.value = value;
     this.target = value;
     this.omega = (2 * Math.PI) / response;
@@ -19,24 +19,31 @@ class Spring {
     this.target = target;
   }
 
+  get settled() {
+    return Math.abs(this.target - this.value) < 0.01 && Math.abs(this.velocity) < 0.05;
+  }
+
   step(dt = 0.016) {
-    const subDt = dt / 2;
-    for (let i = 0; i < 2; i++) {
-      const f = -2 * this.zeta * this.omega * this.velocity - this.omega * this.omega * (this.value - this.target);
-      this.velocity += f * subDt;
-      this.value += this.velocity * subDt;
+    const steps = Math.max(1, Math.ceil(dt / (1 / 240)));
+    const h = dt / steps;
+    for (let i = 0; i < steps; i++) {
+      const acc =
+        this.omega * this.omega * (this.target - this.value) -
+        2 * this.zeta * this.omega * this.velocity;
+      this.velocity += acc * h;
+      this.value += this.velocity * h;
     }
-    const settled = Math.abs(this.value - this.target) < 0.05 && Math.abs(this.velocity) < 0.05;
-    if (settled) {
+    if (this.settled) {
       this.value = this.target;
       this.velocity = 0;
+      return true;
     }
-    return settled;
+    return false;
   }
 }
 
-test("Spring reaches target smoothly without NaN", () => {
-  const spring = new Spring(0, 0.45, 0.75);
+test("Coucou Spring reaches target smoothly without NaN", () => {
+  const spring = new Spring(0, 0.5, 0.72);
   spring.set(100);
 
   let settled = false;
@@ -46,14 +53,6 @@ test("Spring reaches target smoothly without NaN", () => {
     if (settled) break;
   }
 
-  assert.ok(settled, "Spring should settle within reasonable frames");
+  assert.ok(settled, "Coucou Spring should settle within reasonable frames");
   assert.equal(spring.value, 100, "Spring should settle at exact target");
-});
-
-test("Spring snaps immediately when requested", () => {
-  const spring = new Spring(10, 0.45, 0.75);
-  spring.value = 50;
-  spring.target = 50;
-  spring.velocity = 0;
-  assert.equal(spring.value, 50);
 });

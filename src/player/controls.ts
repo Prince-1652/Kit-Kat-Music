@@ -52,6 +52,19 @@ export class PlayerControls {
       }
     });
 
+    const prevBtn = this.container.querySelector("#btn-prev") as HTMLButtonElement;
+    prevBtn?.addEventListener("click", () => {
+      const cur = this.engine.audio.currentTime || 0;
+      this.engine.seek(Math.max(0, cur - 10));
+    });
+
+    const nextBtn = this.container.querySelector("#btn-next") as HTMLButtonElement;
+    nextBtn?.addEventListener("click", () => {
+      const cur = this.engine.audio.currentTime || 0;
+      const dur = this.engine.audio.duration || cur + 10;
+      this.engine.seek(Math.min(dur, cur + 10));
+    });
+
     const scrubber = this.container.querySelector("#scrubber") as HTMLInputElement;
     const timeCur = this.container.querySelector("#time-current") as HTMLElement;
     const timeTot = this.container.querySelector("#time-total") as HTMLElement;
@@ -76,19 +89,28 @@ export class PlayerControls {
 
     const volSlider = this.container.querySelector("#vol-slider") as HTMLInputElement;
     const volBtn = this.container.querySelector("#btn-vol") as HTMLButtonElement;
+    const updateVolGradient = (val: number) => {
+      const pct = Math.round(val * 100);
+      volSlider.style.background = `linear-gradient(to right, var(--kk-text-dim) ${pct}%, var(--kk-surface) ${pct}%)`;
+    };
+    updateVolGradient(1);
+
     volSlider.addEventListener("input", () => {
       const val = parseFloat(volSlider.value);
       this.engine.setVolume(val);
+      updateVolGradient(val);
       volBtn.innerHTML = renderIcon(val === 0 ? "volumeX" : "volume2");
     });
     volBtn.addEventListener("click", () => {
       if (this.engine.audio.volume > 0) {
         this.engine.setVolume(0);
         volSlider.value = "0";
+        updateVolGradient(0);
         volBtn.innerHTML = renderIcon("volumeX");
       } else {
         this.engine.setVolume(1);
         volSlider.value = "1";
+        updateVolGradient(1);
         volBtn.innerHTML = renderIcon("volume2");
       }
     });

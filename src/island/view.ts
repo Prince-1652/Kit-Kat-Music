@@ -10,16 +10,16 @@ interface IslandConfig {
 
 const CONFIGS: Record<IslandMode, IslandConfig> = {
   hidden: { w: 240, h: 6, r: 6 },
-  pill: { w: 280, h: 36, r: 16 },
-  panel: { w: 620, h: 160, r: 20 },
-  "panel-search": { w: 620, h: 310, r: 20 },
+  pill: { w: 280, h: 34, r: 16 },
+  panel: { w: 580, h: 132, r: 18 },
+  "panel-search": { w: 580, h: 285, r: 18 },
 };
 
 export class IslandView {
   private readonly el: HTMLElement;
-  private readonly springW = new Spring(240, 0.45, 0.75);
-  private readonly springH = new Spring(6, 0.45, 0.75);
-  private readonly springR = new Spring(6, 0.45, 0.75);
+  private readonly springW = new Spring(240, 0.5, 0.72);
+  private readonly springH = new Spring(6, 0.5, 0.72);
+  private readonly springR = new Spring(6, 0.5, 0.72);
   private isAnimating = false;
 
   constructor(el: HTMLElement) {
@@ -50,10 +50,7 @@ export class IslandView {
 
     this.el.style.width = `${w}px`;
     this.el.style.height = `${h}px`;
-    this.el.style.borderTopLeftRadius = "0px";
-    this.el.style.borderTopRightRadius = "0px";
-    this.el.style.borderBottomLeftRadius = `${r}px`;
-    this.el.style.borderBottomRightRadius = `${r}px`;
+    this.el.style.borderRadius = `0 0 ${r}px ${r}px`;
 
     // Report bounds to Tauri backend for click-through hit-testing
     const rect = this.el.getBoundingClientRect();

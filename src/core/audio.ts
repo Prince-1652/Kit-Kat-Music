@@ -11,18 +11,12 @@ export type PlaybackState = "idle" | "buffering" | "playing" | "paused" | "error
 
 export class AudioEngine {
   readonly audio = new Audio();
-  private ctx: AudioContext | null = null;
-  private analyser: AnalyserNode | null = null;
-  private source: MediaElementAudioSourceNode | null = null;
-  private freqData = new Uint8Array(16);
-
   currentTrack: AudioTrack | null = null;
   state: PlaybackState = "idle";
   onStateChange?: (state: PlaybackState) => void;
   onTimeUpdate?: (currentTime: number, duration: number) => void;
 
   constructor() {
-    this.audio.crossOrigin = "anonymous";
     this.audio.preload = "auto";
 
     this.audio.addEventListener("playing", () => this.setState("playing"));
@@ -31,34 +25,13 @@ export class AudioEngine {
     this.audio.addEventListener("timeupdate", () => {
       this.onTimeUpdate?.(this.audio.currentTime, this.audio.duration || 0);
     });
-    this.audio.addEventListener("error", () => this.setState("error"));
-  }
-
-  private initAudioContext(): void {
-    if (this.ctx) return;
-    const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-    if (!AudioCtx) return;
-
-    this.ctx = new AudioCtx();
-    this.analyser = this.ctx.createAnalyser();
-    this.analyser.fftSize = 32;
-    this.freqData = new Uint8Array(this.analyser.frequencyBinCount);
-
-    try {
-      this.source = this.ctx.createMediaElementSource(this.audio);
-      this.source.connect(this.analyser);
-      this.analyser.connect(this.ctx.destination);
-    } catch {
-      // Fallback if cross-origin source cannot connect to audio graph
-    }
+    this.audio.addEventListener("error", (e) => {
+      console.error("Audio error event:", this.audio.error, e);
+      this.setState("error");
+    });
   }
 
   async play(track: AudioTrack): Promise<void> {
-    this.initAudioContext();
-    if (this.ctx?.state === "suspended") {
-      await this.ctx.resume();
-    }
-
     this.currentTrack = track;
     this.audio.src = track.streamUrl;
     this.setState("buffering");
@@ -76,9 +49,6 @@ export class AudioEngine {
 
   resume(): void {
     if (this.audio.src) {
-      if (this.ctx?.state === "suspended") {
-        this.ctx.resume();
-      }
       this.audio.play().catch(() => this.setState("error"));
     }
   }
@@ -94,15 +64,15 @@ export class AudioEngine {
   }
 
   getFrequencyBars(): number[] {
-    if (!this.analyser || this.state !== "playing") {
-      return [0.2, 0.2, 0.2, 0.2];
+    if (this.state !== "playing") {
+      return [0.15, 0.15, 0.15, 0.15];
     }
-    this.analyser.getByteFrequencyData(this.freqData);
+    const t = this.audio.currentTime * 10;
     return [
-      Math.max(0.15, this.freqData[1] / 255),
-      Math.max(0.15, this.freqData[3] / 255),
-      Math.max(0.15, this.freqData[6] / 255),
-      Math.max(0.15, this.freqData[10] / 255),
+      0.2 + 0.7 * Math.abs(Math.sin(t * 0.8)),
+      0.25 + 0.75 * Math.abs(Math.sin(t * 1.3 + 1.2)),
+      0.3 + 0.65 * Math.abs(Math.cos(t * 1.7 + 0.5)),
+      0.2 + 0.6 * Math.abs(Math.sin(t * 2.2 + 2.1)),
     ];
   }
 

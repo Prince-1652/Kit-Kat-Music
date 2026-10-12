@@ -7,14 +7,14 @@ All styling, layouts, components, icons, and transitions MUST adhere strictly to
 
 ## 1. Core Principles
 
-1. **Material 3 Dark Only**: Deep black-green canvas, container layering instead of shadows, zero glossy gradients.
+1. **Material 3 Dark Only**: Sleek dark/OLED canvas, container layering instead of shadows, zero shadows on island.
 2. **Strict Palette (60-30-10)**:
-   * **60% Background**: `#0C130F`
-   * **30% Container / Surface**: `#1B2E23`
-   * **10% Highlight / Accent**: `#57D18B`
+   * **60% Background**: `#0A0A0B` (Clean deep dark, zero green cast)
+   * **30% Container / Surface**: `#161618`
+   * **10% Highlight / Accent**: `#4ADE80` (Refined Material green accent)
 3. **No Emojis**: Strictly Lucide rounded SVG icons (`stroke-width="2"`). Use icons instead of text where appropriate.
-4. **8dp Grid**: All margins, paddings, and gap sizes are multiples of 8dp (or 4dp for compact elements). Side margins: 16dp.
-5. **Coucou-Style Physics**: Spring animations for state morphing (`response: 0.45`, `damping: 0.75`). No abrupt linear jumps.
+4. **8dp Grid**: All margins, paddings, and gap sizes are multiples of 8dp (or 4dp for compact elements). Zero dead space.
+5. **Coucou-Style Physics**: Exact Coucou spring physics (`response: 0.5`, `dampingFraction: 0.72`). No abrupt linear jumps.
 6. **Zero Clutter**: If an element has no direct function, remove it.
 
 ---
@@ -23,15 +23,15 @@ All styling, layouts, components, icons, and transitions MUST adhere strictly to
 
 | Token | Hex | Role | Usage |
 |---|---|---|---|
-| `--kk-bg` | `#0C130F` | 60% Background | App canvas, transparent island base, menu base |
-| `--kk-surface` | `#1B2E23` | 30% Container | Search bar background, result cards, inactive slider tracks, chip fill |
-| `--kk-surface-hover` | `#243D2F` | Hover fill | Hover state on list cards and clickable surfaces |
-| `--kk-primary` | `#57D18B` | 10% Highlight | Play FAB, active slider progress, live EQ bars, focus rings |
-| `--kk-on-primary` | `#0C130F` | Text on Primary | Icon inside Play FAB |
-| `--kk-text` | `#E4F0E8` | High Emphasis | Track titles, search text, active values |
-| `--kk-text-dim` | `#9FB8A9` | Medium Emphasis | Artist names, time elapsed/total, placeholder text |
+| `--kk-bg` | `#0A0A0B` | Canvas / Base | App canvas, island panel background, menu base |
+| `--kk-surface` | `#161618` | Container / Surface | Search bar, result cards, album art container, inactive sliders |
+| `--kk-surface-hover` | `#222225` | Hover Fill | Hover state on list cards and clickable surfaces |
+| `--kk-primary` | `#4ADE80` | Accent Highlight | Play FAB, active slider progress, live EQ bars |
+| `--kk-on-primary` | `#0A0A0B` | Text on Primary | Icon inside Play FAB |
+| `--kk-text` | `#F3F3F5` | High Emphasis | Track titles, search text, active values |
+| `--kk-text-dim` | `#8F8F94` | Medium Emphasis | Artist names, time elapsed/total, placeholder text |
 | `--kk-error` | `#E57373` | Error State | Network offline notice, invalid video alert |
-| `--kk-border` | `rgba(87, 209, 139, 0.12)` | Subtle Outline | Island outer border stroke |
+| `--kk-border` | `rgba(255, 255, 255, 0.08)` | Subtle Outline | Island outer border stroke |
 
 ---
 
@@ -79,26 +79,26 @@ Font family: `'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sa
 * **Click**: Morphs to State 3.
 * **Inactivity**: Disappears to State 1 after 10 seconds of no interaction.
 
-### State 3: Expanded Panel (Coucou Height: 160px)
-* **Dimensions**: Width: `620px`, Height: `160px` (Expands to `310px` during search).
-* **Padding**: `12px 18px 14px 18px`.
+### State 3: Expanded Panel (Snug Height: 132px)
+* **Dimensions**: Width: `580px`, Height: `132px` (Expands to `285px` during search).
+* **Padding**: `8px 14px 10px 14px`.
 * **Sections**:
-  1. **Header (34px)**:
-     * Full-width search bar (`#1B2E23`, `height: 34px`, `padding: 0 12px`, `border-radius: 10px`).
-     * Left: `Search` icon (`16px`, `#9FB8A9`).
-     * Input: Transparent text input (`13px`, `#E4F0E8`).
+  1. **Header (32px)**:
+     * Full-width search bar (`#161618`, `height: 32px`, `padding: 0 10px`, `border-radius: 8px`).
+     * Left: `Search` icon (`16px`, `#8F8F94`).
+     * Input: Transparent text input (`13px`, `#F3F3F5`).
      * Right: `X` icon (clear, shown only when text entered).
      * No closing arrow: clicking outside collapses island.
-  2. **Search Mode (Dynamic Expansion to 310px)**:
-     * When search bar is focused or query typed, height springs smoothly to `310px`.
-     * Shows scrollable search results list (up to 4 results, `40px` each).
-     * Selecting a song plays it and collapses height back to `160px`.
-  3. **Horizontal Media Player (88px)**:
-     * Left: Album art (`74x74px` with subtle glowing border).
+  2. **Search Mode (Dynamic Expansion to 285px)**:
+     * When search bar is focused or query typed, height springs smoothly to `285px`.
+     * Shows scrollable search results list (up to 4 results, `34px` each).
+     * Selecting a song plays it and collapses height back to `132px`.
+  3. **Horizontal Media Player (74px)**:
+     * Left: Album art (`74x74px` with subtle border, no glow).
      * Right:
-       * Row 1: Title (`14px` bold) + Artist (`11px` dim), right-aligned Volume icon + slider.
-       * Row 2: Thick seekbar (`7px` pill bar with gradient progress fill), elapsed & total time.
-       * Row 3: Centered Skip Backward (`18px`), Play/Pause FAB (`36x36px` `#57D18B`), Skip Forward (`18px`).
+       * Row 1: Title (`13px` bold) + Artist (`11px` dim), right-aligned Volume icon + slider.
+       * Row 2: Thick seekbar (`6px` pill bar with gradient progress fill), elapsed & total time.
+       * Row 3: Centered Skip Backward (`18px`), Play/Pause FAB (`32x32px` `#4ADE80`), Skip Forward (`18px`).
 
 ---
 

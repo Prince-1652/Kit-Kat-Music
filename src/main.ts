@@ -165,7 +165,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   searchManager.onTrackSelect = async (track) => {
     try {
       searchResults.innerHTML = `<div class="search-loading">${renderIcon("loader2")} Resolving audio stream...</div>`;
-      // FIXED: pass `videoId: track.id` matching Tauri camelCase IPC convention
+      // Pass `videoId: track.id` matching Tauri camelCase IPC convention
       const stream = await invoke<StreamPayload>("get_stream_url", { videoId: track.id });
       const fullTrack = {
         id: track.id,
@@ -180,7 +180,7 @@ window.addEventListener("DOMContentLoaded", async () => {
       controls.updateTrackInfo(fullTrack);
       fsm.setPlaying(true);
 
-      // Spring smoothly back to compact panel height (160px)
+      // Spring smoothly back to compact panel height
       fsm.collapseSearch();
 
       const pillTitle = document.getElementById("pill-title");
@@ -199,17 +199,23 @@ window.addEventListener("DOMContentLoaded", async () => {
       clearBtn.classList.remove("visible");
     } catch (err) {
       searchResults.innerHTML = `<div class="search-error">${renderIcon("wifiOff")} Stream error: ${err}</div>`;
+      setTimeout(() => {
+        if (fsm.mode === "panel-search" && !searchInput.value.trim()) {
+          searchResults.innerHTML = "";
+          fsm.collapseSearch();
+        }
+      }, 4000);
     }
   };
 
-  // 60fps EQ Animation loop for Pill
+  // EQ Animation loop for Pill
+  const barEls = Array.from(pill.querySelectorAll<HTMLElement>(".bar"));
   function updateEq() {
-    if (fsm.mode === "pill") {
+    if (fsm.mode === "pill" && engine.state === "playing") {
       const bars = engine.getFrequencyBars();
-      const barEls = pill.querySelectorAll<HTMLElement>(".bar");
-      barEls.forEach((el, i) => {
-        el.style.transform = `scaleY(${bars[i]})`;
-      });
+      for (let i = 0; i < barEls.length; i++) {
+        barEls[i].style.transform = `scaleY(${bars[i]})`;
+      }
     }
     requestAnimationFrame(updateEq);
   }

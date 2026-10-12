@@ -19,6 +19,19 @@ export class SearchManager {
   setup(inputEl: HTMLInputElement, resultsContainer: HTMLElement, clearBtn?: HTMLButtonElement): void {
     inputEl.addEventListener("focus", () => {
       this.onSearchOpen?.();
+      if (inputEl.value.trim().length === 0 && resultsContainer.children.length === 0) {
+        resultsContainer.innerHTML = `<div class="search-hint">${renderIcon("search")} Type song or artist to search YouTube</div>`;
+      }
+    });
+
+    inputEl.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        const q = inputEl.value.trim();
+        if (q.length > 0) {
+          if (this.timer) clearTimeout(this.timer);
+          this.runSearch(q, resultsContainer);
+        }
+      }
     });
 
     inputEl.addEventListener("input", () => {
@@ -34,7 +47,7 @@ export class SearchManager {
       if (this.timer) clearTimeout(this.timer);
 
       if (q.length === 0) {
-        resultsContainer.innerHTML = "";
+        resultsContainer.innerHTML = `<div class="search-hint">${renderIcon("search")} Type song or artist to search YouTube</div>`;
         return;
       }
 
