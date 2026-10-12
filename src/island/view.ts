@@ -10,8 +10,9 @@ interface IslandConfig {
 
 const CONFIGS: Record<IslandMode, IslandConfig> = {
   hidden: { w: 240, h: 6, r: 6 },
-  pill: { w: 260, h: 38, r: 19 },
-  panel: { w: 560, h: 380, r: 28 },
+  pill: { w: 280, h: 36, r: 16 },
+  panel: { w: 620, h: 160, r: 20 },
+  "panel-search": { w: 620, h: 310, r: 20 },
 };
 
 export class IslandView {
@@ -49,7 +50,10 @@ export class IslandView {
 
     this.el.style.width = `${w}px`;
     this.el.style.height = `${h}px`;
-    this.el.style.borderRadius = `${r}px`;
+    this.el.style.borderTopLeftRadius = "0px";
+    this.el.style.borderTopRightRadius = "0px";
+    this.el.style.borderBottomLeftRadius = `${r}px`;
+    this.el.style.borderBottomRightRadius = `${r}px`;
 
     // Report bounds to Tauri backend for click-through hit-testing
     const rect = this.el.getBoundingClientRect();

@@ -1,7 +1,7 @@
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Mutex;
 use std::time::Duration;
-use tauri::{AppHandle, Manager, PhysicalPosition, PhysicalSize, WebviewWindow};
+use tauri::{AppHandle, Emitter, Manager, PhysicalPosition, PhysicalSize, WebviewWindow};
 
 #[derive(Clone, Copy, Default)]
 pub struct IslandRect {
@@ -42,8 +42,8 @@ pub fn setup_window(app: &AppHandle) {
         if let Ok(Some(monitor)) = window.primary_monitor() {
             let screen_size = monitor.size();
             let scale = monitor.scale_factor();
-            let win_w = (580.0 * scale) as u32;
-            let win_h = (400.0 * scale) as u32;
+            let win_w = (640.0 * scale) as u32;
+            let win_h = (360.0 * scale) as u32;
             let x = ((screen_size.width - win_w) / 2) as i32;
 
             let _ = window.set_size(PhysicalSize::new(win_w, win_h));
@@ -60,9 +60,11 @@ pub fn setup_window(app: &AppHandle) {
 
 fn run_cursor_poll(window: WebviewWindow) {
     use windows::Win32::Foundation::POINT;
+    use windows::Win32::UI::Input::KeyboardAndMouse::GetAsyncKeyState;
     use windows::Win32::UI::WindowsAndMessaging::GetCursorPos;
 
     let mut is_ignoring = false;
+    let mut was_down = false;
 
     loop {
         std::thread::sleep(Duration::from_millis(16));
@@ -91,6 +93,13 @@ fn run_cursor_poll(window: WebviewWindow) {
             && (pt.x as f64) <= (island_screen_x + island_screen_w + margin)
             && (pt.y as f64) >= 0.0
             && (pt.y as f64) <= (island_screen_y + island_screen_h + margin);
+
+        // Check if user clicked left mouse button outside active panel
+        let down = (unsafe { GetAsyncKeyState(0x01) } as u16 & 0x8000) != 0;
+        if down && !was_down && !inside && !state.collapsed.load(Ordering::Relaxed) {
+            let _ = window.emit("click-outside", ());
+        }
+        was_down = down;
 
         let should_ignore = !inside;
 

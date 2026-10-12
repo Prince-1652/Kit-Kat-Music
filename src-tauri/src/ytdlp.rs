@@ -183,10 +183,14 @@ pub async fn extract_stream_url(video_id: String) -> Result<StreamPayload, Strin
         return Err(String::from_utf8_lossy(&output.stderr).to_string());
     }
 
-    let stream_url = String::from_utf8_lossy(&output.stdout).trim().to_string();
-    if stream_url.is_empty() {
-        return Err("No stream URL returned".to_string());
-    }
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    let stream_url = stdout
+        .lines()
+        .map(|s| s.trim())
+        .filter(|s| s.starts_with("http"))
+        .last()
+        .ok_or_else(|| "No valid stream URL returned by yt-dlp".to_string())?
+        .to_string();
 
     Ok(StreamPayload {
         stream_url,

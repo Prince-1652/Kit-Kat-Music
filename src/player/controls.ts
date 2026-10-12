@@ -6,28 +6,39 @@ export class PlayerControls {
 
   constructor(
     private engine: AudioEngine,
-    private container: HTMLElement,
-    private heroContainer: HTMLElement
+    private container: HTMLElement
   ) {}
 
   render(): void {
     this.container.innerHTML = `
-      <div class="scrubber-group">
-        <input type="range" id="scrubber" class="scrubber-slider" min="0" max="100" value="0" />
-        <div class="scrubber-times">
-          <span id="time-current">0:00</span>
-          <span id="time-total">0:00</span>
+      <div class="player-main">
+        <div class="album-art-wrap" id="player-art-wrap">
+          <img id="player-art" src="" style="display:none;" />
+          <div id="art-placeholder" style="color:var(--kk-primary);">${renderIcon("play")}</div>
         </div>
-      </div>
-      <div class="controls-row">
-        <div class="controls-main">
-          <button id="btn-prev" class="btn-icon">${renderIcon("skipBack")}</button>
-          <button id="btn-play" class="btn-fab">${renderIcon("play")}</button>
-          <button id="btn-next" class="btn-icon">${renderIcon("skipForward")}</button>
-        </div>
-        <div class="vol-group">
-          <button id="btn-vol" class="btn-icon">${renderIcon("volume2")}</button>
-          <input type="range" id="vol-slider" class="vol-slider" min="0" max="1" step="0.05" value="1" />
+        <div class="player-details">
+          <div class="details-header">
+            <div class="track-text">
+              <div class="track-title" id="track-title">KitKat Music</div>
+              <div class="track-artist" id="track-artist">Select track to play</div>
+            </div>
+            <div class="vol-group">
+              <button id="btn-vol" class="btn-icon" title="Mute/Unmute">${renderIcon("volume2")}</button>
+              <input type="range" id="vol-slider" class="vol-slider" min="0" max="1" step="0.05" value="1" />
+            </div>
+          </div>
+          <div class="seekbar-row">
+            <span class="time-label" id="time-current">0:00</span>
+            <div class="seekbar-track-container">
+              <input type="range" id="scrubber" class="thick-seekbar" min="0" max="100" value="0" />
+            </div>
+            <span class="time-label" id="time-total">0:00</span>
+          </div>
+          <div class="controls-bottom-row">
+            <button id="btn-prev" class="btn-icon" title="Previous">${renderIcon("skipBack")}</button>
+            <button id="btn-play" class="btn-fab" title="Play/Pause">${renderIcon("play")}</button>
+            <button id="btn-next" class="btn-icon" title="Next">${renderIcon("skipForward")}</button>
+          </div>
         </div>
       </div>
     `;
@@ -45,6 +56,11 @@ export class PlayerControls {
     const timeCur = this.container.querySelector("#time-current") as HTMLElement;
     const timeTot = this.container.querySelector("#time-total") as HTMLElement;
 
+    const updateSeekbarGradient = (val: number) => {
+      scrubber.style.background = `linear-gradient(to right, var(--kk-primary) ${val}%, var(--kk-surface) ${val}%)`;
+    };
+    updateSeekbarGradient(0);
+
     scrubber.addEventListener("mousedown", () => { this.isScrubbing = true; });
     scrubber.addEventListener("mouseup", () => {
       this.isScrubbing = false;
@@ -52,7 +68,9 @@ export class PlayerControls {
       this.engine.seek(targetTime);
     });
     scrubber.addEventListener("input", () => {
-      const cur = (parseFloat(scrubber.value) / 100) * (this.engine.audio.duration || 0);
+      const val = parseFloat(scrubber.value);
+      updateSeekbarGradient(val);
+      const cur = (val / 100) * (this.engine.audio.duration || 0);
       timeCur.textContent = this.formatTime(cur);
     });
 
@@ -81,23 +99,33 @@ export class PlayerControls {
 
     this.engine.onTimeUpdate = (current, duration) => {
       if (!this.isScrubbing && duration > 0) {
-        scrubber.value = ((current / duration) * 100).toString();
+        const pct = (current / duration) * 100;
+        scrubber.value = pct.toString();
+        updateSeekbarGradient(pct);
         timeCur.textContent = this.formatTime(current);
         timeTot.textContent = this.formatTime(duration);
       }
     };
   }
 
-  updateHero(track: AudioTrack): void {
-    this.heroContainer.innerHTML = `
-      <div class="hero-player">
-        <img src="${track.thumbnailUrl || ""}" class="hero-thumb" onerror="this.style.display='none'" />
-        <div class="hero-meta">
-          <div class="hero-title">${track.title}</div>
-          <div class="hero-artist">${track.artist}</div>
-        </div>
-      </div>
-    `;
+  updateTrackInfo(track: AudioTrack): void {
+    const titleEl = this.container.querySelector("#track-title");
+    const artistEl = this.container.querySelector("#track-artist");
+    const artImg = this.container.querySelector("#player-art") as HTMLImageElement;
+    const placeholder = this.container.querySelector("#art-placeholder") as HTMLElement;
+
+    if (titleEl) titleEl.textContent = track.title;
+    if (artistEl) artistEl.textContent = track.artist;
+    if (artImg) {
+      if (track.thumbnailUrl) {
+        artImg.src = track.thumbnailUrl;
+        artImg.style.display = "block";
+        if (placeholder) placeholder.style.display = "none";
+      } else {
+        artImg.style.display = "none";
+        if (placeholder) placeholder.style.display = "block";
+      }
+    }
   }
 
   private formatTime(secs: number): string {

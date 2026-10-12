@@ -13,10 +13,24 @@ export class SearchManager {
   private timer: number | null = null;
   private currentQueryId = 0;
   onTrackSelect?: (track: SearchResult) => void;
+  onSearchOpen?: () => void;
+  onSearchClose?: () => void;
 
   setup(inputEl: HTMLInputElement, resultsContainer: HTMLElement, clearBtn?: HTMLButtonElement): void {
+    inputEl.addEventListener("focus", () => {
+      this.onSearchOpen?.();
+    });
+
     inputEl.addEventListener("input", () => {
       const q = inputEl.value.trim();
+      if (clearBtn) {
+        if (q.length > 0) {
+          clearBtn.classList.add("visible");
+        } else {
+          clearBtn.classList.remove("visible");
+        }
+      }
+
       if (this.timer) clearTimeout(this.timer);
 
       if (q.length === 0) {
@@ -24,13 +38,16 @@ export class SearchManager {
         return;
       }
 
+      this.onSearchOpen?.();
       this.timer = window.setTimeout(() => this.runSearch(q, resultsContainer), 350);
     });
 
     clearBtn?.addEventListener("click", () => {
       inputEl.value = "";
+      clearBtn.classList.remove("visible");
       resultsContainer.innerHTML = "";
-      inputEl.focus();
+      this.onSearchClose?.();
+      inputEl.blur();
     });
   }
 
@@ -68,7 +85,7 @@ export class SearchManager {
       });
     } catch (err) {
       if (queryId === this.currentQueryId) {
-        container.innerHTML = `<div class="search-error">${renderIcon("wifiOff")} Search failed (${err})</div>`;
+        container.innerHTML = `<div class="search-error">${renderIcon("wifiOff")} Search error: ${err}</div>`;
       }
     }
   }

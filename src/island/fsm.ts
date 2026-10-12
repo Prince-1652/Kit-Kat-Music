@@ -1,4 +1,4 @@
-export type IslandMode = "hidden" | "pill" | "panel";
+export type IslandMode = "hidden" | "pill" | "panel" | "panel-search";
 
 export class IslandFSM {
   private current: IslandMode = "hidden";
@@ -9,9 +9,13 @@ export class IslandFSM {
     return this.current;
   }
 
+  get isPlaying(): boolean {
+    return this.isMusicPlaying;
+  }
+
   setPlaying(playing: boolean): void {
     this.isMusicPlaying = playing;
-    if (this.current !== "panel") {
+    if (this.current !== "panel" && this.current !== "panel-search") {
       this.transition(playing ? "pill" : "hidden");
     }
   }
@@ -20,12 +24,27 @@ export class IslandFSM {
     this.transition("panel");
   }
 
+  expandSearch(): void {
+    this.transition("panel-search");
+  }
+
+  collapseSearch(): void {
+    if (this.current === "panel-search") {
+      this.transition("panel");
+    }
+  }
+
   collapse(): void {
-    this.transition(this.isMusicPlaying ? "pill" : "hidden");
+    // When collapsed, return to pill first (Coucou behavior)
+    this.transition("pill");
+  }
+
+  hide(): void {
+    this.transition("hidden");
   }
 
   toggle(): void {
-    if (this.current === "panel") {
+    if (this.current === "panel" || this.current === "panel-search") {
       this.collapse();
     } else {
       this.expand();

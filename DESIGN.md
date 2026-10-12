@@ -50,11 +50,13 @@ Font family: `'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sa
 
 ## 4. Shapes & Corner Radii
 
-* **Pill**: `border-radius: 9999px` (fully rounded capsule, 19px on 38px height).
-* **Expanded Panel**: `border-radius: 28px` (Material 3 XL shape).
-* **Cards / Search Field**: `border-radius: 12px` (Material 3 Medium shape).
-* **Album Art (Hero)**: `border-radius: 16px`.
-* **Play FAB**: `border-radius: 9999px` (Circle 44x44px).
+* **Top Corners**: Flat (`border-top-left-radius: 0; border-top-right-radius: 0`) across all island states.
+* **Pill**: `border-radius: 0 0 16px 16px`.
+* **Expanded Panel**: `border-radius: 0 0 20px 20px` (Material 3 XL shape with reduced bottom roundness).
+* **Cards / Search Field**: `border-radius: 10px`.
+* **Album Art (Hero)**: `border-radius: 12px` (74x74px square).
+* **Play FAB**: `border-radius: 50%` (Circle 36x36px).
+* **Seekbar Track**: `border-radius: 3.5px` (Thick 7px Material 3 pill bar).
 
 ---
 
@@ -63,41 +65,40 @@ Font family: `'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sa
 ### State 1: Hidden (Idle)
 * **Dimensions**: Width: `240px`, Height: `6px`.
 * **Position**: Top-center (`x = (screen_width - 240) / 2`, `y = 0`).
-* **Visual**: Near-invisible `#0C130F` strip with `opacity: 0.6`.
+* **Visual**: Near-invisible `#0C130F` strip with `opacity: 0.65`.
 * **Click-through**: Enabled outside this 6px strip.
 
 ### State 2: Compact Pill (Playing)
-* **Dimensions**: Width: `260px`, Height: `38px`.
+* **Dimensions**: Width: `280px`, Height: `36px`.
 * **Position**: Pinned to top notch.
-* **Layout**: Horizontal flexbox (`padding: 4px 12px`, `gap: 8px`).
-  * Left: `24x24px` circular album thumbnail.
+* **Layout**: Horizontal flexbox (`padding: 4px 14px`, `gap: 10px`).
+  * Left: `22x22px` circular album thumbnail.
   * Center: Marquee text containing `Title • Artist` (`color: #E4F0E8`).
-  * Right: 4 live bouncing EQ bars (`width: 3px`, `max-height: 14px`, `color: #57D18B`).
-* **Hover**: Overlay showing mini Play/Pause icon.
+  * Right: 4 live bouncing EQ bars (`width: 3px`, `height: 13px`, `color: #57D18B`).
+* **Hover / Leave**: Cancels/resets 10-second auto-disappear timer.
 * **Click**: Morphs to State 3.
+* **Inactivity**: Disappears to State 1 after 10 seconds of no interaction.
 
-### State 3: Expanded Panel (Search + Player)
-* **Dimensions**: Width: `560px`, Height: `380px`.
-* **Padding**: `16px 20px 20px 20px`.
+### State 3: Expanded Panel (Coucou Height: 160px)
+* **Dimensions**: Width: `620px`, Height: `160px` (Expands to `310px` during search).
+* **Padding**: `12px 18px 14px 18px`.
 * **Sections**:
-  1. **Header (44px)**:
-     * Search bar container (`#1B2E23`, `height: 40px`, `padding: 0 12px`).
-     * Left: `Search` icon (`18px`, `#9FB8A9`).
-     * Input: Transparent text input, auto-focused.
-     * Right: `X` icon (clear) and `ChevronUp` icon (collapse to pill/hidden).
-  2. **Content Body (Flexible)**:
-     * *Mode A (Default/Hero Player)*:
-       * Left: `120x120px` Artwork (`border-radius: 16px`).
-       * Right: Track title (`18px`), artist (`14px`), Scrubber slider (`height: 4px` track, `#57D18B` fill, `#E4F0E8` thumb), elapsed / total timestamps.
-     * *Mode B (Search Active)*:
-       * Vertical list of up to 5 search results (`height: 48px` each).
-       * Left: `36x36px` rounded thumbnail.
-       * Center: Title (`14px`) + Artist (`12px`).
-       * Right: Duration (`10px`).
-       * Hover: Background shifts to `--kk-surface-hover`.
-  3. **Control Bar (56px)**:
-     * Center: Skip Backward (`20px`), Play/Pause FAB (`44x44px` `#57D18B`), Skip Forward (`20px`).
-     * Right: Volume slider with `Volume2` / `VolumeX` mute toggle.
+  1. **Header (34px)**:
+     * Full-width search bar (`#1B2E23`, `height: 34px`, `padding: 0 12px`, `border-radius: 10px`).
+     * Left: `Search` icon (`16px`, `#9FB8A9`).
+     * Input: Transparent text input (`13px`, `#E4F0E8`).
+     * Right: `X` icon (clear, shown only when text entered).
+     * No closing arrow: clicking outside collapses island.
+  2. **Search Mode (Dynamic Expansion to 310px)**:
+     * When search bar is focused or query typed, height springs smoothly to `310px`.
+     * Shows scrollable search results list (up to 4 results, `40px` each).
+     * Selecting a song plays it and collapses height back to `160px`.
+  3. **Horizontal Media Player (88px)**:
+     * Left: Album art (`74x74px` with subtle glowing border).
+     * Right:
+       * Row 1: Title (`14px` bold) + Artist (`11px` dim), right-aligned Volume icon + slider.
+       * Row 2: Thick seekbar (`7px` pill bar with gradient progress fill), elapsed & total time.
+       * Row 3: Centered Skip Backward (`18px`), Play/Pause FAB (`36x36px` `#57D18B`), Skip Forward (`18px`).
 
 ---
 
