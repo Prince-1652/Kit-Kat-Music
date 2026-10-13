@@ -47,3 +47,7 @@ Thumbs.db
 # Test / Automation artifacts
 .playwright-mcp/
 coverage/
+
+# Launch video & brag artifacts
+brag-output/
+brag-output-*/
