@@ -1,5 +1,5 @@
 import { invoke } from "@tauri-apps/api/core";
-import { renderIcon } from "../core/icons";
+import { renderIcon, renderM3Loader } from "../core/icons";
 
 export interface SearchResult {
   id: string;
@@ -12,16 +12,55 @@ export interface SearchResult {
 export class SearchManager {
   private timer: number | null = null;
   private currentQueryId = 0;
+  private isSearchOpen = false;
+
   onTrackSelect?: (track: SearchResult) => void;
   onSearchOpen?: () => void;
   onSearchClose?: () => void;
 
-  setup(inputEl: HTMLInputElement, resultsContainer: HTMLElement, clearBtn?: HTMLButtonElement): void {
-    inputEl.addEventListener("focus", () => {
-      this.onSearchOpen?.();
-      if (inputEl.value.trim().length === 0 && resultsContainer.children.length === 0) {
-        resultsContainer.innerHTML = `<div class="search-hint">${renderIcon("search")} Type song or artist to search YouTube</div>`;
+  close(): void {
+    this.isSearchOpen = false;
+  }
+
+  setup(inputEl: HTMLInputElement, resultsContainer: HTMLElement, clearBtn?: HTMLButtonElement, searchBar?: HTMLElement): void {
+    const renderIdleState = () => {
+      resultsContainer.innerHTML = `
+        <div class="search-empty-state">
+          <div class="empty-icon-pill">${renderIcon("search")}</div>
+          <div class="empty-text">
+            <div class="empty-title">Search music</div>
+            <div class="empty-sub">Type a track, artist, or album name</div>
+          </div>
+        </div>
+      `;
+    };
+
+    const triggerOpen = () => {
+      if (!this.isSearchOpen) {
+        this.isSearchOpen = true;
+        this.onSearchOpen?.();
       }
+      if (inputEl.value.trim().length === 0) {
+        // Prevent re-rendering and re-animating if already in idle state
+        if (!resultsContainer.querySelector(".search-empty-state:not(.error)")) {
+          renderIdleState();
+        }
+      }
+    };
+
+    searchBar?.addEventListener("click", (e) => {
+      if (e.target !== clearBtn && !clearBtn?.contains(e.target as Node)) {
+        if (document.activeElement === inputEl) {
+          triggerOpen();
+        } else {
+          // Focus triggers inputEl focus listener cleanly without double-call
+          inputEl.focus();
+        }
+      }
+    });
+
+    inputEl.addEventListener("focus", () => {
+      triggerOpen();
     });
 
     inputEl.addEventListener("keydown", (e) => {
@@ -47,18 +86,25 @@ export class SearchManager {
       if (this.timer) clearTimeout(this.timer);
 
       if (q.length === 0) {
-        resultsContainer.innerHTML = `<div class="search-hint">${renderIcon("search")} Type song or artist to search YouTube</div>`;
+        this.currentQueryId++; // Invalidate any inflight query
+        renderIdleState();
         return;
       }
 
-      this.onSearchOpen?.();
+      if (!this.isSearchOpen) {
+        this.isSearchOpen = true;
+        this.onSearchOpen?.();
+      }
       this.timer = window.setTimeout(() => this.runSearch(q, resultsContainer), 350);
     });
 
     clearBtn?.addEventListener("click", () => {
+      this.currentQueryId++; // Invalidate any inflight query
+      if (this.timer) clearTimeout(this.timer);
       inputEl.value = "";
       clearBtn.classList.remove("visible");
       resultsContainer.innerHTML = "";
+      this.isSearchOpen = false;
       this.onSearchClose?.();
       inputEl.blur();
     });
@@ -66,14 +112,22 @@ export class SearchManager {
 
   private async runSearch(query: string, container: HTMLElement): Promise<void> {
     const queryId = ++this.currentQueryId;
-    container.innerHTML = `<div class="search-loading">${renderIcon("loader2")} Searching YouTube...</div>`;
+    container.innerHTML = renderM3Loader("Searching YouTube...");
 
     try {
       const tracks = await invoke<SearchResult[]>("search_music", { query });
       if (queryId !== this.currentQueryId) return;
 
       if (tracks.length === 0) {
-        container.innerHTML = `<div class="search-empty">No tracks found</div>`;
+        container.innerHTML = `
+          <div class="search-empty-state">
+            <div class="empty-icon-pill">${renderIcon("search")}</div>
+            <div class="empty-text">
+              <div class="empty-title">No tracks found</div>
+              <div class="empty-sub">Try searching with different keywords or artist names</div>
+            </div>
+          </div>
+        `;
         return;
       }
 
@@ -98,7 +152,15 @@ export class SearchManager {
       });
     } catch (err) {
       if (queryId === this.currentQueryId) {
-        container.innerHTML = `<div class="search-error">${renderIcon("wifiOff")} Search error: ${err}</div>`;
+        container.innerHTML = `
+          <div class="search-empty-state error">
+            <div class="empty-icon-pill error">${renderIcon("wifiOff")}</div>
+            <div class="empty-text">
+              <div class="empty-title">Search failed</div>
+              <div class="empty-sub">Check internet connection and try again</div>
+            </div>
+          </div>
+        `;
       }
     }
   }

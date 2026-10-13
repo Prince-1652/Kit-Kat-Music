@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::process::Stdio;
 use serde::{Deserialize, Serialize};
 use tokio::process::Command;
@@ -28,6 +28,13 @@ pub struct StreamPayload {
     pub duration_secs: Option<u64>,
 }
 
+fn create_command<P: AsRef<Path>>(bin: P) -> Command {
+    let mut cmd = Command::new(bin.as_ref());
+    #[cfg(windows)]
+    cmd.creation_flags(0x08000000); // CREATE_NO_WINDOW
+    cmd
+}
+
 pub fn get_local_ytdlp_path() -> PathBuf {
     let local_data = dirs_local_data().unwrap_or_else(|| PathBuf::from("."));
     let bin_dir = local_data.join("Kitkat").join("bin");
@@ -46,7 +53,7 @@ pub async fn resolve_ytdlp_bin() -> Option<PathBuf> {
         return Some(local);
     }
     // 2. Check system PATH
-    if let Ok(output) = Command::new("yt-dlp")
+    if let Ok(output) = create_command("yt-dlp")
         .arg("--version")
         .output()
         .await
@@ -60,7 +67,7 @@ pub async fn resolve_ytdlp_bin() -> Option<PathBuf> {
 
 pub async fn check_status() -> Result<YtDlpStatus, String> {
     if let Some(path) = resolve_ytdlp_bin().await {
-        let output = Command::new(&path)
+        let output = create_command(&path)
             .arg("--version")
             .output()
             .await
@@ -98,20 +105,31 @@ pub async fn download_ytdlp() -> Result<(), String> {
         .await
         .map_err(|e| format!("Failed to read stream: {e}"))?;
 
-    tokio::fs::write(&target_path, bytes)
+    // Atomic write via temporary file to prevent leaving corrupt binary on failure
+    let tmp_path = target_path.with_extension("exe.part");
+    tokio::fs::write(&tmp_path, bytes)
         .await
         .map_err(|e| format!("Failed to write yt-dlp binary: {e}"))?;
+
+    tokio::fs::rename(&tmp_path, &target_path)
+        .await
+        .map_err(|e| format!("Failed to finalize yt-dlp binary: {e}"))?;
 
     Ok(())
 }
 
 pub async fn search_tracks(query: String) -> Result<Vec<TrackMetadata>, String> {
+    let q = query.trim();
+    if q.is_empty() {
+        return Ok(Vec::new());
+    }
+
     let bin = resolve_ytdlp_bin()
         .await
         .ok_or_else(|| "yt-dlp is not installed".to_string())?;
 
-    let search_arg = format!("ytsearch8:{}", query);
-    let output = Command::new(bin)
+    let search_arg = format!("ytsearch8:{}", q);
+    let output = create_command(bin)
         .args([
             "--dump-single-json",
             "--flat-playlist",
@@ -127,7 +145,12 @@ pub async fn search_tracks(query: String) -> Result<Vec<TrackMetadata>, String> 
         .map_err(|e| e.to_string())?;
 
     if !output.status.success() {
-        return Err(String::from_utf8_lossy(&output.stderr).to_string());
+        let err_msg = String::from_utf8_lossy(&output.stderr);
+        return Err(if err_msg.trim().is_empty() {
+            "Search process failed".to_string()
+        } else {
+            err_msg.trim().to_string()
+        });
     }
 
     let json: serde_json::Value = serde_json::from_slice(&output.stdout)
@@ -146,6 +169,7 @@ pub async fn search_tracks(query: String) -> Result<Vec<TrackMetadata>, String> 
                 .and_then(|arr| arr.last())
                 .and_then(|thumb| thumb.get("url"))
                 .and_then(|u| u.as_str())
+                .or_else(|| entry.get("thumbnail").and_then(|t| t.as_str()))
                 .map(|s| s.to_string());
 
             results.push(TrackMetadata {
@@ -162,25 +186,34 @@ pub async fn search_tracks(query: String) -> Result<Vec<TrackMetadata>, String> 
 }
 
 pub async fn extract_stream_url(video_id: String) -> Result<StreamPayload, String> {
+    let vid = video_id.trim();
+    if vid.is_empty() {
+        return Err("video_id cannot be empty".to_string());
+    }
+
     let bin = resolve_ytdlp_bin()
         .await
         .ok_or_else(|| "yt-dlp is not installed".to_string())?;
 
-    let url = format!("https://www.youtube.com/watch?v={}", video_id);
-    let output = Command::new(bin)
+    let url = format!("https://www.youtube.com/watch?v={}", vid);
+    let output = create_command(bin)
         .args([
             "-g",
             "-f",
             "ba[ext=m4a]/ba/b",
             "--no-playlist",
+            "--no-warnings",
             &url,
         ])
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
         .output()
         .await
         .map_err(|e| e.to_string())?;
 
     if !output.status.success() {
-        return Err(String::from_utf8_lossy(&output.stderr).to_string());
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        return Err(format!("yt-dlp failed: {}", stderr.trim()));
     }
 
     let stdout = String::from_utf8_lossy(&output.stdout);

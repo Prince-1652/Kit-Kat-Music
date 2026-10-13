@@ -3,11 +3,9 @@ import type { AudioEngine, AudioTrack } from "./audio";
 export function setupMediaSession(engine: AudioEngine, onNext?: () => void, onPrev?: () => void): void {
   if (!("mediaSession" in navigator)) return;
 
-  const originalStateChange = engine.onStateChange;
-  engine.onStateChange = (state) => {
-    originalStateChange?.(state);
+  engine.addStateListener((state) => {
     navigator.mediaSession.playbackState = state === "playing" ? "playing" : state === "paused" ? "paused" : "none";
-  };
+  });
 
   try {
     navigator.mediaSession.setActionHandler("play", () => engine.resume());

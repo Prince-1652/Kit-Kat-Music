@@ -28,7 +28,12 @@ try {
   const chosenUrl = lines[lines.length - 1];
   console.log("Extracted Stream URL prefix:", chosenUrl.substring(0, 80));
 
-  const headRes = await fetch(chosenUrl, { method: "HEAD" });
+  const headRes = await fetch(chosenUrl, {
+    method: "HEAD",
+    headers: {
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    }
+  });
   console.log("HEAD status:", headRes.status);
   console.log("Content-Type:", headRes.headers.get("content-type"));
   console.log("Accept-Ranges:", headRes.headers.get("accept-ranges"));

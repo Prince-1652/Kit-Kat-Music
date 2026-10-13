@@ -1,6 +1,3 @@
-export const clamp = (v: number, lo: number, hi: number): number => Math.max(lo, Math.min(hi, v));
-export const lerp = (a: number, b: number, t: number): number => a + (b - a) * t;
-
 /**
  * Coucou exact Spring physics solver matching SwiftUI .spring(response: 0.5, dampingFraction: 0.72)
  */
@@ -38,8 +35,10 @@ export class Spring {
   }
 
   step(dt = 0.016): boolean {
-    const steps = Math.max(1, Math.ceil(dt / (1 / 240)));
-    const h = dt / steps;
+    // Clamp delta-time to avoid numerical instability on frame lag spikes
+    const safeDt = Math.max(0.001, Math.min(dt, 0.064));
+    const steps = Math.max(1, Math.ceil(safeDt / (1 / 240)));
+    const h = safeDt / steps;
     for (let i = 0; i < steps; i++) {
       const acc =
         this.omega * this.omega * (this.target - this.value) -

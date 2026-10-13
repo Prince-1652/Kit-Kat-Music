@@ -67,18 +67,19 @@ fn run_cursor_poll(window: WebviewWindow) {
     let mut was_down = false;
 
     loop {
-        std::thread::sleep(Duration::from_millis(16));
-
         let mut pt = POINT::default();
-        unsafe {
-            if GetCursorPos(&mut pt).is_err() {
-                continue;
-            }
-        }
+        let cursor_ok = unsafe { GetCursorPos(&mut pt).is_ok() };
 
-        let Ok(win_pos) = window.outer_position() else { continue };
+        let Ok(win_pos) = window.outer_position() else {
+            std::thread::sleep(Duration::from_millis(60));
+            continue;
+        };
 
-        let Some(state) = window.try_state::<WindowManager>() else { continue };
+        let Some(state) = window.try_state::<WindowManager>() else {
+            std::thread::sleep(Duration::from_millis(60));
+            continue;
+        };
+
         let rect = *state.rect.lock().unwrap();
         let scale = window.scale_factor().unwrap_or(1.0);
 
@@ -89,9 +90,10 @@ fn run_cursor_poll(window: WebviewWindow) {
         let island_screen_h = rect.h * scale;
 
         let margin = 14.0 * scale;
-        let inside = (pt.x as f64) >= (island_screen_x - margin)
+        let inside = cursor_ok
+            && (pt.x as f64) >= (island_screen_x - margin)
             && (pt.x as f64) <= (island_screen_x + island_screen_w + margin)
-            && (pt.y as f64) >= 0.0
+            && (pt.y as f64) >= (island_screen_y - margin)
             && (pt.y as f64) <= (island_screen_y + island_screen_h + margin);
 
         // Check if user clicked left mouse button outside active panel
@@ -106,6 +108,15 @@ fn run_cursor_poll(window: WebviewWindow) {
         if should_ignore != is_ignoring {
             is_ignoring = should_ignore;
             let _ = window.set_ignore_cursor_events(is_ignoring);
+        }
+
+        // Adaptive polling: 16ms when cursor is near/inside or panel is open, 60ms when idle/distant
+        let is_collapsed = state.collapsed.load(Ordering::Relaxed);
+        let is_near = cursor_ok && (pt.y as f64) < (island_screen_y + island_screen_h + 60.0 * scale);
+        if is_collapsed && !inside && !is_near {
+            std::thread::sleep(Duration::from_millis(60));
+        } else {
+            std::thread::sleep(Duration::from_millis(16));
         }
     }
 }
