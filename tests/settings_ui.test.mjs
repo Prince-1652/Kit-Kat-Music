@@ -23,7 +23,7 @@ test("CSS: responsive select dropdown is hidden by default with !important on fu
   assert.ok(settingsCss.includes(".m3-responsive-select {\n    display: inline-flex !important;"), "responsive select must only show under 740px breakpoint");
 });
 
-test("CSS: dropdown select is styled as a Material 3 Expressive pill", () => {
+test("CSS: dropdown select is styled as a pill", () => {
   const settingsCss = fs.readFileSync(path.resolve("src/settings.css"), "utf-8");
   assert.match(settingsCss, /\.m3-select\s*\{[^}]*border-radius:\s*17px/s, "m3-select must have 17px rounded pill radius");
   assert.match(settingsCss, /\.m3-select-arrow/s, "m3-select-arrow must be present for dropdown arrow");

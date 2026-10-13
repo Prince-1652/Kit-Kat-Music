@@ -201,7 +201,7 @@ window.addEventListener("DOMContentLoaded", async () => {
         <input type="text" id="search-input" placeholder="Search tracks or artists..." autocomplete="off" spellcheck="false" />
         <button id="btn-clear" class="btn-clear">${renderIcon("x")}</button>
       </div>
-      <button id="btn-settings-header" class="btn-settings-header" title="Customize KitKat (Material 3)">
+      <button id="btn-settings-header" class="btn-settings-header" title="Customize KitKat">
         ${renderIcon("settings")}
       </button>
     </div>

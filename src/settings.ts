@@ -84,7 +84,7 @@ window.addEventListener("DOMContentLoaded", () => {
           <img src="/logo.png" class="app-bar-logo" alt="KitKat" />
           <div>
             <div class="app-bar-title">KitKat Customization</div>
-            <div class="app-bar-subtitle">Material 3 Expressive Controls</div>
+            <div class="app-bar-subtitle">Dynamic Island Player Preferences</div>
           </div>
         </div>
       </header>
