@@ -99,9 +99,9 @@ npm run tauri build
 The compiled binaries will be output to:
 ```text
 src-tauri/target/release/
-  kitkat-desktop.exe                  # Standalone executable
+  kitkat-desktop.exe                  # Standalone portable executable
   bundle/nsis/
-    kitkat-desktop_0.1.0_x64-setup.exe # Windows NSIS Installer
+    KitKat_0.1.0_x64-setup.exe        # Windows NSIS Setup Installer (3.96 MB)
 ```
 
 ---

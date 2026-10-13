@@ -32,6 +32,7 @@ export interface IslandConfigCustom {
   artworkGlow: boolean;
   showVolumeControl: boolean;
   skipDurationSecs: 5 | 10 | 15 | 30;
+  launchAtStartup: boolean;
 }
 
 export interface AppConfig {
@@ -149,12 +150,12 @@ export const SURFACE_PRESETS: Record<string, { bg: string; surface: string; hove
 
 export const DEFAULT_CONFIG: AppConfig = {
   theme: {
-    accentColor: "#4ADE80",
+    accentColor: "#FB923C",
     darkSurface: "oled",
   },
   seekbar: {
     heightPx: 8,
-    style: "wavy-animated",
+    style: "continuous",
     showThumb: true,
     showHoverGlow: true,
     showTimeLabels: true,
@@ -172,6 +173,7 @@ export const DEFAULT_CONFIG: AppConfig = {
     artworkGlow: true,
     showVolumeControl: true,
     skipDurationSecs: 10,
+    launchAtStartup: false,
   },
 };
 

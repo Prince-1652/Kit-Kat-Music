@@ -61,6 +61,69 @@ fn update_island_shape(
     }
 }
 
+#[cfg(target_os = "windows")]
+use std::os::windows::process::CommandExt;
+
+#[tauri::command]
+fn get_launch_at_startup() -> Result<bool, String> {
+    #[cfg(target_os = "windows")]
+    {
+        let mut cmd = std::process::Command::new("reg");
+        cmd.args(["query", r"HKCU\Software\Microsoft\Windows\CurrentVersion\Run", "/v", "KitKatMusic"]);
+        cmd.creation_flags(0x08000000);
+        let output = cmd.output().map_err(|e| e.to_string())?;
+        Ok(output.status.success())
+    }
+    #[cfg(not(target_os = "windows"))]
+    {
+        Ok(false)
+    }
+}
+
+#[tauri::command]
+fn set_launch_at_startup(enable: bool) -> Result<(), String> {
+    #[cfg(target_os = "windows")]
+    {
+        if enable {
+            let exe_path = std::env::current_exe().map_err(|e| e.to_string())?;
+            let exe_str = format!("\"{}\"", exe_path.to_string_lossy());
+            let mut cmd = std::process::Command::new("reg");
+            cmd.args([
+                "add",
+                r"HKCU\Software\Microsoft\Windows\CurrentVersion\Run",
+                "/v",
+                "KitKatMusic",
+                "/t",
+                "REG_SZ",
+                "/d",
+                &exe_str,
+                "/f",
+            ]);
+            cmd.creation_flags(0x08000000);
+            let status = cmd.status().map_err(|e| e.to_string())?;
+            if !status.success() {
+                return Err("Failed to enable launch at startup in registry".into());
+            }
+        } else {
+            let mut cmd = std::process::Command::new("reg");
+            cmd.args([
+                "delete",
+                r"HKCU\Software\Microsoft\Windows\CurrentVersion\Run",
+                "/v",
+                "KitKatMusic",
+                "/f",
+            ]);
+            cmd.creation_flags(0x08000000);
+            let _ = cmd.status();
+        }
+        Ok(())
+    }
+    #[cfg(not(target_os = "windows"))]
+    {
+        Ok(())
+    }
+}
+
 pub fn run() {
     Builder::default()
         .manage(window::WindowManager::new())
@@ -86,6 +149,8 @@ pub fn run() {
             update_island_shape,
             open_settings,
             close_settings,
+            get_launch_at_startup,
+            set_launch_at_startup,
         ])
         .run(tauri::generate_context!())
         .expect("error while running KitKat application");

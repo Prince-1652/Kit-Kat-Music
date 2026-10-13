@@ -21,6 +21,17 @@ window.addEventListener("DOMContentLoaded", () => {
   let cfg: AppConfig = loadConfig();
   applyThemeToDOM(cfg);
 
+  // Sync startup setting from Windows registry if running inside Tauri
+  invoke<boolean>("get_launch_at_startup")
+    .then((enabled) => {
+      if (typeof enabled === "boolean" && enabled !== cfg.island.launchAtStartup) {
+        cfg = { ...cfg, island: { ...cfg.island, launchAtStartup: enabled } };
+        saveConfig(cfg);
+        render();
+      }
+    })
+    .catch(() => {});
+
   // Live simulation interactive preview state
   let previewMode: "panel" | "pill" = "panel";
   let previewPlaying = true;
@@ -176,7 +187,7 @@ window.addEventListener("DOMContentLoaded", () => {
                           <div class="preview-seekbar-fill ${wavyClass}" style="width: ${previewScrubPercent}%;">
                             <div class="preview-wavy-flow-inner"></div>
                           </div>
-                          <div class="preview-seekbar-thumb-dot" style="left: ${previewScrubPercent}%; ${cfg.seekbar.showThumb ? "" : "display: none;"}"></div>
+                          <div class="preview-seekbar-thumb-dot" style="left: clamp(7px, ${previewScrubPercent}%, calc(100% - 7px)); ${cfg.seekbar.showThumb ? "" : "display: none;"}"></div>
                         </div>
                         <span class="preview-time-label" style="${cfg.seekbar.showTimeLabels ? "" : "display: none;"}">
                           ${formatTime(totalDuration)}
@@ -506,6 +517,16 @@ window.addEventListener("DOMContentLoaded", () => {
                 String(cfg.island.skipDurationSecs)
               )}
             </div>
+
+            <div class="setting-row">
+              <div class="setting-text">
+                <div class="setting-title">Launch at Startup</div>
+                <div class="setting-desc">Automatically start KitKat in the background when Windows boots</div>
+              </div>
+              <div class="m3-switch ${cfg.island.launchAtStartup ? "active" : ""}" id="switch-autostart">
+                <div class="m3-switch-thumb"></div>
+              </div>
+            </div>
           </div>
         </section>
       </div>
@@ -744,6 +765,21 @@ window.addEventListener("DOMContentLoaded", () => {
       commitUpdate({
         ...cfg,
         island: { ...cfg.island, skipDurationSecs: parseInt(val, 10) as 5 | 10 | 15 | 30 },
+      });
+    });
+
+    // Switch launch at startup
+    const switchAutostart = document.getElementById("switch-autostart");
+    switchAutostart?.addEventListener("click", async () => {
+      const nextVal = !cfg.island.launchAtStartup;
+      try {
+        await invoke("set_launch_at_startup", { enable: nextVal });
+      } catch (err) {
+        console.error("Failed to update launch at startup in registry:", err);
+      }
+      commitUpdate({
+        ...cfg,
+        island: { ...cfg.island, launchAtStartup: nextVal },
       });
     });
   }

@@ -41,3 +41,11 @@ test("CSS: album cover image inherits container radius without zooming scale or 
   assert.match(styleCss, /#art-placeholder\s*\{[^}]*border-radius:\s*inherit/s, "placeholder must inherit border-radius");
 });
 
+test("CSS: seekbar row has 14px gap ensuring thumb never overlaps 0:00 timestamp", () => {
+  const styleCss = fs.readFileSync(path.resolve("src/style.css"), "utf-8");
+  const settingsCss = fs.readFileSync(path.resolve("src/settings.css"), "utf-8");
+  assert.match(styleCss, /\.seekbar-row\s*\{[^}]*gap:\s*14px/s, "seekbar-row in style.css must have gap: 14px");
+  assert.match(settingsCss, /\.preview-seekbar-row\s*\{[^}]*gap:\s*14px/s, "preview-seekbar-row in settings.css must have gap: 14px");
+});
+
+

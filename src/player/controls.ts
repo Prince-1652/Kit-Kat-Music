@@ -121,7 +121,7 @@ export class PlayerControls {
         seekbarFill.style.display = "block";
       }
       if (thumbDot) {
-        thumbDot.style.left = `${val}%`;
+        thumbDot.style.left = `clamp(7px, ${val}%, calc(100% - 7px))`;
         thumbDot.style.display = this.showThumb ? "block" : "none";
       }
     };

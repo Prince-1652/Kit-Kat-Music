@@ -482,7 +482,7 @@ body {
 .preview-seekbar-row {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 14px;
   width: 100%;
   position: relative;
 }
@@ -492,6 +492,7 @@ body {
   color: var(--kk-text-dim);
   font-variant-numeric: tabular-nums;
   flex-shrink: 0;
+  min-width: 24px;
 }
 
 .preview-seekbar-track-container {
