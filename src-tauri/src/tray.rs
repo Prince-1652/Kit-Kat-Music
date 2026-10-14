@@ -5,10 +5,11 @@ use tauri::{AppHandle, Emitter, Manager};
 pub fn build_tray(app: &AppHandle) -> tauri::Result<()> {
     let open_item = MenuItem::with_id(app, "open", "Show Island", true, None::<&str>)?;
     let settings_item = MenuItem::with_id(app, "settings", "Customization…", true, None::<&str>)?;
+    let update_item = MenuItem::with_id(app, "check_updates", "Check for Updates…", true, None::<&str>)?;
     let sep = PredefinedMenuItem::separator(app)?;
     let quit_item = MenuItem::with_id(app, "quit", "Quit KitKat", true, None::<&str>)?;
 
-    let menu = Menu::with_items(app, &[&open_item, &settings_item, &sep, &quit_item])?;
+    let menu = Menu::with_items(app, &[&open_item, &settings_item, &update_item, &sep, &quit_item])?;
 
     let mut builder = TrayIconBuilder::with_id("kitkat-tray")
         .tooltip("KitKat Music")
@@ -22,6 +23,12 @@ pub fn build_tray(app: &AppHandle) -> tauri::Result<()> {
             }
             "settings" => {
                 crate::open_settings_window(app);
+            }
+            "check_updates" => {
+                crate::open_settings_window(app);
+                if let Some(win) = app.get_webview_window("settings") {
+                    let _ = win.emit("trigger-update-check", ());
+                }
             }
             "quit" => {
                 app.exit(0);
