@@ -90,9 +90,14 @@ export class AudioEngine {
   }
 
   seek(seconds: number): void {
-    if (Number.isFinite(seconds)) {
-      const max = this.audio.duration > 0 ? this.audio.duration : seconds;
-      this.audio.currentTime = Math.max(0, Math.min(max, seconds));
+    if (Number.isFinite(seconds) && this.audio.src) {
+      try {
+        const hasDur = Number.isFinite(this.audio.duration) && this.audio.duration > 0;
+        const max = hasDur ? this.audio.duration : seconds;
+        this.audio.currentTime = Math.max(0, Math.min(max, seconds));
+      } catch {
+        // Ignore seek error if media element is not in ready state yet
+      }
     }
   }
 

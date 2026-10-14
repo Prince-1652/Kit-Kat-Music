@@ -41,8 +41,11 @@ export class PlayerControls {
       trackContainer.classList.toggle("wavy-mode", cfg.seekbar.style === "wavy-animated" || cfg.seekbar.style === "wavy-still");
     }
     const volGroup = this.container.querySelector(".vol-group") as HTMLElement;
+    const bottomRow = this.container.querySelector(".controls-bottom-row") as HTMLElement;
     if (volGroup) {
-      volGroup.style.display = cfg.island.showVolumeControl === false ? "none" : "flex";
+      const show = cfg.island.showVolumeControl !== false;
+      volGroup.style.display = show ? "flex" : "none";
+      bottomRow?.classList.toggle("has-no-vol", !show);
     }
   }
 
@@ -59,10 +62,6 @@ export class PlayerControls {
               <div class="track-title" id="track-title">KitKat Music</div>
               <div class="track-artist" id="track-artist">Search music to play</div>
             </div>
-            <div class="vol-group">
-              <button id="btn-vol" class="btn-icon" title="Mute/Unmute">${renderIcon("volume2")}</button>
-              <input type="range" id="vol-slider" class="vol-slider" min="0" max="1" step="0.05" value="1" />
-            </div>
           </div>
           <div class="seekbar-row" id="seekbar-row">
             <span class="time-label" id="time-current">0:00</span>
@@ -75,13 +74,26 @@ export class PlayerControls {
             <span class="time-label" id="time-total">0:00</span>
           </div>
           <div class="controls-bottom-row">
-            <button id="btn-prev" class="btn-icon">${renderIcon("skipBack")}</button>
-            <button id="btn-play" class="btn-play-pill">${renderIcon("play")}<span class="play-label">Play</span></button>
-            <button id="btn-next" class="btn-icon">${renderIcon("skipForward")}</button>
+            <div class="transport-group">
+              <button id="btn-prev" class="btn-icon" title="Previous">${renderIcon("skipBack")}</button>
+              <button id="btn-play" class="btn-play-glyph" title="Play/Pause">${renderIcon("play")}</button>
+              <button id="btn-next" class="btn-icon" title="Next">${renderIcon("skipForward")}</button>
+            </div>
+            <div class="vol-group">
+              <button id="btn-vol" class="btn-icon" title="Mute/Unmute">${renderIcon("volume2")}</button>
+              <input type="range" id="vol-slider" class="vol-slider" min="0" max="1" step="0.05" value="1" />
+            </div>
           </div>
         </div>
       </div>
     `;
+
+    const artImg = this.container.querySelector("#player-art") as HTMLImageElement;
+    const placeholder = this.container.querySelector("#art-placeholder") as HTMLElement;
+    artImg?.addEventListener("error", () => {
+      artImg.style.display = "none";
+      if (placeholder) placeholder.style.display = "block";
+    });
 
     const playBtn = this.container.querySelector("#btn-play") as HTMLButtonElement;
     playBtn.addEventListener("click", () => {
@@ -182,7 +194,7 @@ export class PlayerControls {
 
     this.engine.addStateListener((state) => {
       const isPlaying = state === "playing";
-      playBtn.innerHTML = `${renderIcon(isPlaying ? "pause" : "play")}<span class="play-label">${isPlaying ? "Pause" : "Play"}</span>`;
+      playBtn.innerHTML = renderIcon(isPlaying ? "pause" : "play");
       const artWrap = this.container.querySelector("#player-art-wrap");
       if (artWrap) {
         artWrap.classList.toggle("is-playing", isPlaying);
@@ -227,6 +239,11 @@ export class PlayerControls {
         artImg.style.display = "none";
         if (placeholder) placeholder.style.display = "block";
       }
+    }
+
+    const glowEl = document.getElementById("island-ambient-glow");
+    if (glowEl) {
+      glowEl.style.backgroundImage = track.thumbnailUrl ? `url('${track.thumbnailUrl}')` : "none";
     }
   }
 

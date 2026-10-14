@@ -47,9 +47,9 @@ fn dirs_local_data() -> Option<PathBuf> {
 }
 
 pub async fn resolve_ytdlp_bin() -> Option<PathBuf> {
-    // 1. Check local data directory
+    // 1. Check local data directory (ensure not empty / truncated)
     let local = get_local_ytdlp_path();
-    if local.exists() {
+    if local.is_file() && local.metadata().map(|m| m.len() > 100_000).unwrap_or(false) {
         return Some(local);
     }
     // 2. Check system PATH
@@ -67,25 +67,22 @@ pub async fn resolve_ytdlp_bin() -> Option<PathBuf> {
 
 pub async fn check_status() -> Result<YtDlpStatus, String> {
     if let Some(path) = resolve_ytdlp_bin().await {
-        let output = create_command(&path)
-            .arg("--version")
-            .output()
-            .await
-            .map_err(|e| e.to_string())?;
-
-        let version = String::from_utf8_lossy(&output.stdout).trim().to_string();
-        Ok(YtDlpStatus {
-            installed: true,
-            path: Some(path.to_string_lossy().to_string()),
-            version: Some(version),
-        })
-    } else {
-        Ok(YtDlpStatus {
-            installed: false,
-            path: None,
-            version: None,
-        })
+        if let Ok(output) = create_command(&path).arg("--version").output().await {
+            if output.status.success() {
+                let version = String::from_utf8_lossy(&output.stdout).trim().to_string();
+                return Ok(YtDlpStatus {
+                    installed: true,
+                    path: Some(path.to_string_lossy().to_string()),
+                    version: Some(version),
+                });
+            }
+        }
     }
+    Ok(YtDlpStatus {
+        installed: false,
+        path: None,
+        version: None,
+    })
 }
 
 pub async fn download_ytdlp() -> Result<(), String> {
@@ -105,11 +102,20 @@ pub async fn download_ytdlp() -> Result<(), String> {
         .await
         .map_err(|e| format!("Failed to read stream: {e}"))?;
 
+    if let Some(parent) = target_path.parent() {
+        let _ = tokio::fs::create_dir_all(parent).await;
+    }
+
     // Atomic write via temporary file to prevent leaving corrupt binary on failure
     let tmp_path = target_path.with_extension("exe.part");
     tokio::fs::write(&tmp_path, bytes)
         .await
         .map_err(|e| format!("Failed to write yt-dlp binary: {e}"))?;
+
+    // On Windows, remove existing target first if present to avoid ERROR_ALREADY_EXISTS on rename
+    if target_path.exists() {
+        let _ = tokio::fs::remove_file(&target_path).await;
+    }
 
     tokio::fs::rename(&tmp_path, &target_path)
         .await
@@ -189,6 +195,9 @@ pub async fn extract_stream_url(video_id: String) -> Result<StreamPayload, Strin
     let vid = video_id.trim();
     if vid.is_empty() {
         return Err("video_id cannot be empty".to_string());
+    }
+    if !vid.chars().all(|c| c.is_ascii_alphanumeric() || c == '-' || c == '_') {
+        return Err("Invalid video_id format".to_string());
     }
 
     let bin = resolve_ytdlp_bin()

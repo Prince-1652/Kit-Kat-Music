@@ -34,6 +34,8 @@ export interface IslandConfigCustom {
   skipDurationSecs: 5 | 10 | 15 | 30;
   launchAtStartup: boolean;
   autoCheckUpdates: boolean;
+  bgBlurRadiusPx: number;
+  bgBlurOpacity: number;
 }
 
 export interface AppConfig {
@@ -176,6 +178,8 @@ export const DEFAULT_CONFIG: AppConfig = {
     skipDurationSecs: 10,
     launchAtStartup: false,
     autoCheckUpdates: true,
+    bgBlurRadiusPx: 36,
+    bgBlurOpacity: 62,
   },
 };
 
@@ -211,9 +215,25 @@ export function saveConfig(cfg: AppConfig): void {
   }
 }
 
+function hexToRgb(hex: string): string {
+  const clean = hex.replace("#", "");
+  const num = parseInt(clean.length === 3 ? clean.split("").map((c) => c + c).join("") : clean, 16);
+  const r = (num >> 16) & 255;
+  const g = (num >> 8) & 255;
+  const b = num & 255;
+  return `${r}, ${g}, ${b}`;
+}
+
 export function applyThemeToDOM(cfg: AppConfig, root: HTMLElement = document.documentElement): void {
   const accent = (cfg?.theme?.accentColor && THEME_PRESETS[cfg.theme.accentColor]) || THEME_PRESETS[DEFAULT_CONFIG.theme.accentColor] || THEME_PRESETS["#4ADE80"];
   const surface = (cfg?.theme?.darkSurface && SURFACE_PRESETS[cfg.theme.darkSurface]) || SURFACE_PRESETS[DEFAULT_CONFIG.theme.darkSurface] || SURFACE_PRESETS.oled;
+
+  const rgb = hexToRgb(accent.primary);
+  root.style.setProperty("--kk-primary-rgb", rgb);
+  root.style.setProperty("--kk-glow-core", `rgba(${rgb}, 0.54)`);
+  root.style.setProperty("--kk-glow-mid", `rgba(${rgb}, 0.22)`);
+  root.style.setProperty("--kk-glow-subtle", `rgba(${rgb}, 0.06)`);
+  root.style.setProperty("--kk-glow-halo", `rgba(${rgb}, 0.34)`);
 
   root.style.setProperty("--kk-primary", accent.primary);
   root.style.setProperty("--kk-primary-hover", accent.hover);
@@ -230,8 +250,15 @@ export function applyThemeToDOM(cfg: AppConfig, root: HTMLElement = document.doc
   root.style.setProperty("--kk-seekbar-height", `${cfg.seekbar.heightPx}px`);
   root.style.setProperty("--kk-notch-offset", `${cfg.island.notchOffsetPx}px`);
 
+  const blurPx = cfg?.island?.bgBlurRadiusPx ?? 36;
+  const blurOpacityPercent = cfg?.island?.bgBlurOpacity ?? 62;
+  const blurOpacity = blurOpacityPercent / 100;
+  root.style.setProperty("--kk-bg-blur", `${blurPx}px`);
+  root.style.setProperty("--kk-bg-blur-opacity", `${blurOpacity}`);
+  root.style.setProperty("--kk-bg-blur-opacity-pill", `${Math.round(blurOpacity * 0.7 * 100) / 100}`);
+
   if (cfg.seekbar.showHoverGlow) {
-    root.style.setProperty("--kk-seekbar-glow", `0 0 10px ${accent.container}`);
+    root.style.setProperty("--kk-seekbar-glow", `0 0 6px -1px rgba(${rgb}, 0.35)`);
   } else {
     root.style.setProperty("--kk-seekbar-glow", "none");
   }

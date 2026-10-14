@@ -14,7 +14,6 @@ pub struct IslandRect {
 pub struct WindowManager {
     pub rect: Mutex<IslandRect>,
     pub collapsed: AtomicBool,
-    pub ignoring: AtomicBool,
 }
 
 impl WindowManager {
@@ -27,7 +26,6 @@ impl WindowManager {
                 h: 6.0,
             }),
             collapsed: AtomicBool::new(true),
-            ignoring: AtomicBool::new(false),
         }
     }
 
@@ -44,7 +42,7 @@ pub fn setup_window(app: &AppHandle) {
             let scale = monitor.scale_factor();
             let win_w = (640.0 * scale) as u32;
             let win_h = (360.0 * scale) as u32;
-            let x = ((screen_size.width - win_w) / 2) as i32;
+            let x = (screen_size.width as i32 - win_w as i32) / 2;
 
             let _ = window.set_size(PhysicalSize::new(win_w, win_h));
             let _ = window.set_position(PhysicalPosition::new(x, 0));

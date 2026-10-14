@@ -19,7 +19,6 @@ export class IslandView {
   private notchOffset = 0;
   private currentMode: IslandMode = "hidden";
   private panelWidthPx = 580;
-  private cornerRadiusStyle: "pill" | "curved" | "compact" = "curved";
 
   constructor(el: HTMLElement) {
     this.el = el;
@@ -65,14 +64,8 @@ export class IslandView {
     }
   }
 
-  setCornerRadius(preset: "pill" | "curved" | "compact"): void {
-    this.cornerRadiusStyle = preset;
-    const target = this.getConfigForMode(this.currentMode);
-    this.springR.set(target.r);
-    if (!this.isAnimating) {
-      this.isAnimating = true;
-      requestAnimationFrame(this.tick);
-    }
+  setCornerRadius(_preset: "pill" | "curved" | "compact"): void {
+    // Notch design uses locked radii (17px pill / 28px panel)
   }
 
   private getConfigForMode(mode: IslandMode): IslandConfig {
@@ -80,15 +73,13 @@ export class IslandView {
       return { w: 240, h: 6, r: 6 };
     }
     if (mode === "pill") {
-      const r = this.cornerRadiusStyle === "pill" ? 17 : this.cornerRadiusStyle === "compact" ? 10 : 16;
-      return { w: 280, h: 34, r };
+      return { w: 280, h: 34, r: 17 };
     }
-    const r = this.cornerRadiusStyle === "pill" ? 22 : this.cornerRadiusStyle === "compact" ? 12 : 18;
     if (mode === "panel") {
-      return { w: this.panelWidthPx, h: 136, r };
+      return { w: this.panelWidthPx, h: 136, r: 28 };
     }
     // panel-search
-    return { w: this.panelWidthPx, h: 287, r };
+    return { w: this.panelWidthPx, h: 287, r: 28 };
   }
 
   setMode(mode: IslandMode): void {
@@ -100,8 +91,11 @@ export class IslandView {
 
     this.el.className = `island state-${mode}`;
 
-    // Send immediate update to backend on mode switch
-    this.syncBounds(target.w, target.h);
+    // Only send immediate update to backend on expanding so hit-test is ready instantly;
+    // on collapse, let tick step down smoothly so cursor bounds don't snap prematurely
+    if (target.w > this.springW.value || target.h > this.springH.value) {
+      this.syncBounds(target.w, target.h);
+    }
 
     if (!this.isAnimating) {
       this.isAnimating = true;

@@ -29,16 +29,17 @@ try {
   console.log("Extracted Stream URL prefix:", chosenUrl.substring(0, 80));
 
   const headRes = await fetch(chosenUrl, {
-    method: "HEAD",
+    method: "GET",
     headers: {
+      "Range": "bytes=0-1024",
       "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
     }
   });
-  console.log("HEAD status:", headRes.status);
+  console.log("Audio stream status:", headRes.status);
   console.log("Content-Type:", headRes.headers.get("content-type"));
   console.log("Accept-Ranges:", headRes.headers.get("accept-ranges"));
 
-  if (headRes.status === 200) {
+  if (headRes.status === 200 || headRes.status === 206) {
     console.log("SUCCESS: Stream is directly playable by HTML5 Audio!");
   } else {
     console.error("FAIL: Stream returned status", headRes.status);

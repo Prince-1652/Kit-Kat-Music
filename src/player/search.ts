@@ -134,8 +134,8 @@ export class SearchManager {
       container.innerHTML = tracks
         .map(
           (t) => `
-        <div class="search-item" data-id="${t.id}">
-          <img src="${t.thumbnail_url || ""}" class="search-thumb" onerror="this.style.display='none'" />
+        <div class="search-item" data-id="${this.escapeHtml(t.id)}">
+          <img src="${this.escapeHtml(t.thumbnail_url || "")}" class="search-thumb" alt="" />
           <div class="search-meta">
             <div class="search-title">${this.escapeHtml(t.title)}</div>
             <div class="search-artist">${this.escapeHtml(t.uploader)}</div>
@@ -144,6 +144,12 @@ export class SearchManager {
       `
         )
         .join("");
+
+      container.querySelectorAll<HTMLImageElement>(".search-thumb").forEach((img) => {
+        img.addEventListener("error", () => {
+          img.style.display = "none";
+        });
+      });
 
       container.querySelectorAll(".search-item").forEach((el, index) => {
         el.addEventListener("click", () => {

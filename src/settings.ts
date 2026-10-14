@@ -170,7 +170,6 @@ window.addEventListener("DOMContentLoaded", () => {
             <div class="preview-header-left">
               <span class="preview-badge">Live Preview</span>
               <span style="font-size: 11px; color: var(--kk-text-dim); font-weight: 500;">${accentObj.label}</span>
-              ${cfg.island.notchOffsetPx > 0 ? `<span class="preview-notch-indicator">• +${cfg.island.notchOffsetPx}px Notch</span>` : ""}
               <span class="preview-state-indicator" style="font-size: 11px; color: ${previewPlaying ? "var(--kk-primary)" : "var(--kk-text-dim)"}; font-weight: 600;">
                 • ${previewPlaying ? "Playing" : "Paused"}
               </span>
@@ -179,97 +178,86 @@ window.addEventListener("DOMContentLoaded", () => {
               <button class="m3-segment-btn ${previewMode === "panel" ? "selected" : ""}" id="btn-mode-panel">Panel View</button>
               <button class="m3-segment-btn ${previewMode === "pill" ? "selected" : ""}" id="btn-mode-pill">Pill View</button>
             </div>
-          </div>
+          </div>          <div class="preview-stage">
+            <div class="island state-${previewMode}" id="preview-island" style="width: ${previewMode === 'pill' ? 280 : (cfg.island.panelWidth === 'compact' ? 520 : cfg.island.panelWidth === 'expanded' ? 640 : 580)}px; height: ${previewMode === 'pill' ? 34 : 136}px; border-radius: 0 0 ${previewMode === 'pill' ? 17 : 28}px ${previewMode === 'pill' ? 17 : 28}px; cursor: ${previewMode === 'pill' ? 'pointer' : 'default'};">
+              <div class="island-ambient-glow" style="background-image: url('/logo.png'); filter: blur(${cfg.island.bgBlurRadiusPx ?? 36}px) saturate(200%) brightness(1.22); opacity: ${previewMode === 'pill' ? ((cfg.island.bgBlurOpacity ?? 62) * 0.007).toFixed(2) : ((cfg.island.bgBlurOpacity ?? 62) / 100).toFixed(2)};"></div>
+              <div id="island-wake" class="island-wake"></div>
 
-          <div class="preview-stage">
-            <div class="preview-island-mock ${previewMode === "pill" ? "is-pill is-clickable" : ""}" id="preview-island-mock" title="${previewMode === "pill" ? "Click pill to toggle Play / Pause" : ""}">
-              ${
-                previewMode === "pill"
-                  ? `
-                <div class="preview-pill-content">
-                  <div class="preview-meta">
-                    <div class="preview-thumb ${cfg.island.eqStyle === "pulse" ? "has-pulse" : ""}"></div>
-                    <div class="preview-pill-text">Starboy • The Weeknd</div>
-                  </div>
-                  <div class="preview-eq style-${cfg.island.eqStyle} ${previewPlaying && cfg.island.eqStyle !== "off" ? "animated" : ""}" style="${cfg.island.eqStyle === "off" ? "display: none;" : ""}">
-                    ${
-                      cfg.island.eqStyle === "pulse"
-                        ? `<span class="pulse-orb"></span>`
-                        : `
-                      <span class="bar"></span>
-                      <span class="bar"></span>
-                      <span class="bar"></span>
-                      <span class="bar"></span>
-                    `
-                    }
-                  </div>
+              <div id="island-pill" class="island-pill" style="${previewMode === 'pill' ? 'display: flex;' : 'display: none;'}">
+                <div class="pill-thumb ${cfg.island.eqStyle === 'pulse' ? 'has-pulse' : ''}" style="background-image: url('/logo.png');"></div>
+                <div class="pill-title">KitKat Music</div>
+                <div class="pill-eq style-${cfg.island.eqStyle} ${previewPlaying && cfg.island.eqStyle !== 'off' ? 'animated' : ''}" style="${cfg.island.eqStyle === 'off' ? 'display: none;' : ''}">
+                  ${
+                    cfg.island.eqStyle === "pulse"
+                      ? `<span class="pulse-orb"></span>`
+                      : `
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                  `
+                  }
                 </div>
-              `
-                  : `
-                <div class="preview-panel-content">
-                  <div class="preview-panel-header">
-                    <div class="preview-search-mock">
-                      ${renderIcon("search")}
-                      <span>Search tracks or artists...</span>
-                    </div>
-                    <div class="preview-settings-btn" title="Customization Settings">
-                      ${renderIcon("settings")}
-                    </div>
-                  </div>
+              </div>
 
-                  <div class="preview-player-row">
-                    <div class="preview-art-wrap ${previewPlaying ? "is-playing" : ""}">
-                      <img src="/logo.png" class="preview-art-img" alt="Artwork" />
+              <div id="island-panel" class="island-panel" style="${previewMode === 'panel' ? 'display: flex;' : 'display: none;'}">
+                <div class="panel-header">
+                  <div class="search-bar">
+                    ${renderIcon("search")}
+                    <input type="text" class="search-input" placeholder="Search tracks or artists..." readonly value="" />
+                  </div>
+                  <button class="btn-settings-header" title="Customize KitKat">
+                    ${renderIcon("settings")}
+                  </button>
+                </div>
+
+                <div id="player-controls-container">
+                  <div class="player-main">
+                    <div class="album-art-wrap ${previewPlaying ? 'is-playing' : ''}">
+                      <img src="/logo.png" style="display: block; border-radius: inherit; transform: none;" alt="Artwork" />
                     </div>
-                    <div class="preview-player-body">
-                      <div class="preview-track-meta">
-                        <div style="display: flex; align-items: baseline; gap: 8px; min-width: 0;">
-                          <span class="preview-track-title">Blinding Lights</span>
-                          <span class="preview-track-artist">The Weeknd</span>
+                    <div class="player-details">
+                      <div class="details-header">
+                        <div class="track-text">
+                          <div class="track-title">KitKat Music</div>
+                          <div class="track-artist">Search music to play</div>
                         </div>
-                        ${
-                          cfg.island.showVolumeControl
-                            ? `
-                        <div class="preview-vol-mock" style="display: flex; align-items: center; gap: 6px; color: var(--kk-text-dim); font-size: 11px;">
-                          ${renderIcon("volume2")}
-                          <div style="width: 36px; height: 4px; border-radius: 2px; background: var(--kk-surface-variant); overflow: hidden;">
-                            <div style="width: 75%; height: 100%; background: var(--kk-primary);"></div>
-                          </div>
-                        </div>
-                        `
-                            : ""
-                        }
                       </div>
 
-                      <div class="preview-seekbar-row">
-                        <span class="preview-time-label" style="${cfg.seekbar.showTimeLabels ? "" : "display: none;"}">
+                      <div class="seekbar-row" id="preview-scrubber-row">
+                        <span class="time-label" style="${cfg.seekbar.showTimeLabels ? '' : 'display: none;'}">
                           ${formatTime(currentTime)}
                         </span>
-                        <div class="preview-seekbar-track-container ${isWavy ? "wavy-mode" : ""} ${cfg.seekbar.style === "with-stops" ? "with-stops" : ""}" id="preview-scrubber-track">
-                          <div class="preview-seekbar-bg"></div>
-                          <div class="preview-seekbar-fill ${wavyClass}" style="width: ${previewScrubPercent}%;">
-                            <div class="preview-wavy-flow-inner"></div>
+                        <div class="seekbar-track-container ${isWavy ? 'wavy-mode' : ''} ${cfg.seekbar.style === 'with-stops' ? 'with-stops' : ''}" id="preview-scrubber-track">
+                          <div class="seekbar-track-bg"></div>
+                          <div class="seekbar-fill ${wavyClass}" style="display: block; width: ${previewScrubPercent}%;">
+                            <div class="wavy-flow-inner"></div>
                           </div>
-                          <div class="preview-seekbar-thumb-dot" style="left: clamp(7px, ${previewScrubPercent}%, calc(100% - 7px)); ${cfg.seekbar.showThumb ? "" : "display: none;"}"></div>
+                          <div class="seekbar-thumb-dot" style="left: clamp(7px, ${previewScrubPercent}%, calc(100% - 7px)); ${cfg.seekbar.showThumb ? '' : 'display: none;'}"></div>
+                          <input type="range" class="thick-seekbar" min="0" max="100" value="${previewScrubPercent}" style="opacity: 0; position: absolute; inset: 0; width: 100%; height: 100%; cursor: pointer; z-index: 5;" />
                         </div>
-                        <span class="preview-time-label" style="${cfg.seekbar.showTimeLabels ? "" : "display: none;"}">
+                        <span class="time-label" style="${cfg.seekbar.showTimeLabels ? '' : 'display: none;'}">
                           ${formatTime(totalDuration)}
                         </span>
                       </div>
 
-                      <div class="preview-player-controls-row">
-                        <button class="preview-btn-icon" id="btn-prev-step-back">${renderIcon("skipBack")}</button>
-                        <button class="preview-play-btn" id="btn-prev-play-toggle">
-                          ${renderIcon(previewPlaying ? "pause" : "play")}
-                          <span>${previewPlaying ? "Pause" : "Play"}</span>
-                        </button>
-                        <button class="preview-btn-icon" id="btn-prev-step-fwd">${renderIcon("skipForward")}</button>
+                      <div class="controls-bottom-row ${cfg.island.showVolumeControl ? '' : 'has-no-vol'}">
+                        <div class="transport-group">
+                          <button class="btn-icon" id="btn-prev-step-back" title="Previous">${renderIcon("skipBack")}</button>
+                          <button class="btn-play-glyph" id="btn-prev-play-toggle" title="Play/Pause">
+                            ${renderIcon(previewPlaying ? "pause" : "play")}
+                          </button>
+                          <button class="btn-icon" id="btn-prev-step-fwd" title="Next">${renderIcon("skipForward")}</button>
+                        </div>
+                        <div class="vol-group" style="${cfg.island.showVolumeControl ? '' : 'display: none;'}">
+                          <button class="btn-icon" title="Mute/Unmute">${renderIcon("volume2")}</button>
+                          <input type="range" class="vol-slider" min="0" max="1" step="0.05" value="0.8" />
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              `
-              }
+              </div>
             </div>
           </div>
         </div>
@@ -319,18 +307,24 @@ window.addEventListener("DOMContentLoaded", () => {
 
             <div class="setting-row">
               <div class="setting-text">
-                <div class="setting-title">Glass Effect</div>
-                <div class="setting-desc">Frosted glass blur effect, colorful ambient glow, or solid opaque background</div>
+                <div class="setting-title">Background Blur Radius</div>
+                <div class="setting-desc">Adjust how soft and diffuse the ambient glow effect appears</div>
               </div>
-              ${renderOptionControl(
-                "group-surface-material",
-                [
-                  { val: "acrylic", label: "Frosted Glass" },
-                  { val: "ambient", label: "Ambient Glow" },
-                  { val: "solid", label: "Solid Dark" },
-                ],
-                cfg.island.surfaceMaterial
-              )}
+              <div class="m3-slider-row">
+                <input type="range" class="m3-slider" id="slider-bg-blur" min="12" max="64" step="2" value="${cfg.island.bgBlurRadiusPx ?? 36}" />
+                <span class="m3-slider-value" id="val-bg-blur">${cfg.island.bgBlurRadiusPx ?? 36}px</span>
+              </div>
+            </div>
+
+            <div class="setting-row">
+              <div class="setting-text">
+                <div class="setting-title">Background Blur Opacity</div>
+                <div class="setting-desc">Control the intensity and brightness of the ambient background glow</div>
+              </div>
+              <div class="m3-slider-row">
+                <input type="range" class="m3-slider" id="slider-bg-blur-opacity" min="10" max="100" step="5" value="${cfg.island.bgBlurOpacity ?? 62}" />
+                <span class="m3-slider-value" id="val-bg-blur-opacity">${cfg.island.bgBlurOpacity ?? 62}%</span>
+              </div>
             </div>
           </div>
         </section>
@@ -358,22 +352,6 @@ window.addEventListener("DOMContentLoaded", () => {
 
             <div class="setting-row">
               <div class="setting-text">
-                <div class="setting-title">Bar Thickness</div>
-                <div class="setting-desc">Choose how thick the playback line appears</div>
-              </div>
-              ${renderOptionControl(
-                "group-seekbar-height",
-                [
-                  { val: "4", label: "Thin (4px)" },
-                  { val: "8", label: "Medium (8px)" },
-                  { val: "12", label: "Thick (12px)" },
-                ],
-                String(cfg.seekbar.heightPx)
-              )}
-            </div>
-
-            <div class="setting-row">
-              <div class="setting-text">
                 <div class="setting-title">Wave Animation Speed</div>
                 <div class="setting-desc">How fast the squiggly line ripples while music is playing</div>
               </div>
@@ -394,16 +372,6 @@ window.addEventListener("DOMContentLoaded", () => {
                 <div class="setting-desc">Display a circular pointer dot at current playback position</div>
               </div>
               <div class="m3-switch ${cfg.seekbar.showThumb ? "active" : ""}" id="switch-thumb">
-                <div class="m3-switch-thumb"></div>
-              </div>
-            </div>
-
-            <div class="setting-row">
-              <div class="setting-text">
-                <div class="setting-title">Glow Effect</div>
-                <div class="setting-desc">Add a soft neon glow around the active progress bar</div>
-              </div>
-              <div class="m3-switch ${cfg.seekbar.showHoverGlow ? "active" : ""}" id="switch-glow">
                 <div class="m3-switch-thumb"></div>
               </div>
             </div>
@@ -442,22 +410,6 @@ window.addEventListener("DOMContentLoaded", () => {
 
             <div class="setting-row">
               <div class="setting-text">
-                <div class="setting-title">Corner Roundness</div>
-                <div class="setting-desc">Adjust how rounded the player corners look</div>
-              </div>
-              ${renderOptionControl(
-                "group-corner-radius",
-                [
-                  { val: "pill", label: "Pill Round" },
-                  { val: "curved", label: "Standard Round" },
-                  { val: "compact", label: "Slight Round" },
-                ],
-                cfg.island.cornerRadius
-              )}
-            </div>
-
-            <div class="setting-row">
-              <div class="setting-text">
                 <div class="setting-title">Album Cover Corner Radius</div>
                 <div class="setting-desc">Adjust how rounded the album artwork corners appear without cutting or stretching the picture</div>
               </div>
@@ -485,7 +437,7 @@ window.addEventListener("DOMContentLoaded", () => {
             <div class="setting-row">
               <div class="setting-text">
                 <div class="setting-title">Volume Slider</div>
-                <div class="setting-desc">Show the volume slider directly in the player header</div>
+                <div class="setting-desc">Show the volume slider in the bottom right of the player</div>
               </div>
               <div class="m3-switch ${cfg.island.showVolumeControl ? "active" : ""}" id="switch-vol-control">
                 <div class="m3-switch-thumb"></div>
@@ -528,22 +480,6 @@ window.addEventListener("DOMContentLoaded", () => {
                   { val: "gentle", label: "Gentle & Soft" },
                 ],
                 cfg.island.springSpeed
-              )}
-            </div>
-
-            <div class="setting-row">
-              <div class="setting-text">
-                <div class="setting-title">Top Screen Spacing</div>
-                <div class="setting-desc">Spacing below the top edge of your monitor or camera notch</div>
-              </div>
-              ${renderOptionControl(
-                "group-notch",
-                [
-                  { val: "0", label: "Top Edge (0px)" },
-                  { val: "4", label: "Small Gap (4px)" },
-                  { val: "8", label: "Larger Gap (8px)" },
-                ],
-                String(cfg.island.notchOffsetPx)
               )}
             </div>
 
@@ -601,7 +537,7 @@ window.addEventListener("DOMContentLoaded", () => {
               <div class="setting-text">
                 <div class="setting-title">KitKat Version</div>
                 <div class="setting-desc">
-                  Installed: <strong class="version-tag">v${updateData?.current_version || "0.1.0"}</strong>
+                  Installed: <strong class="version-tag">v${updateData?.current_version || "1.0.0"}</strong>
                   ${updateStatus === "up-to-date" ? `<span class="update-status-pill success">Up to date</span>` : ""}
                   ${updateStatus === "available" ? `<span class="update-status-pill available">Update: ${escapeHtml(updateData?.latest_version || "")}</span>` : ""}
                   ${updateStatus === "checking" ? `<span class="update-status-pill checking">Checking...</span>` : ""}
@@ -733,9 +669,9 @@ window.addEventListener("DOMContentLoaded", () => {
     });
 
     // Preview interactive click on pill view
-    const previewIslandMock = document.getElementById("preview-island-mock");
-    if (previewIslandMock && previewMode === "pill") {
-      previewIslandMock.addEventListener("click", () => {
+    const previewIsland = document.getElementById("preview-island");
+    if (previewIsland && previewMode === "pill") {
+      previewIsland.addEventListener("click", () => {
         previewPlaying = !previewPlaying;
         render();
       });
@@ -785,12 +721,35 @@ window.addEventListener("DOMContentLoaded", () => {
       });
     });
 
-    // Surface material (responsive segmented / select)
-    bindSegmentGroup("group-surface-material", (val) => {
-      commitUpdate({
-        ...cfg,
-        island: { ...cfg.island, surfaceMaterial: val as "acrylic" | "solid" | "ambient" },
-      });
+    // Background blur radius slider
+    const sliderBlur = document.getElementById("slider-bg-blur") as HTMLInputElement | null;
+    const valBlur = document.getElementById("val-bg-blur");
+    const previewGlow = document.querySelector("#preview-island .island-ambient-glow") as HTMLElement | null;
+    sliderBlur?.addEventListener("input", () => {
+      const val = parseInt(sliderBlur.value, 10);
+      if (valBlur) valBlur.textContent = `${val}px`;
+      if (previewGlow) previewGlow.style.filter = `blur(${val}px) saturate(200%) brightness(1.22)`;
+      document.documentElement.style.setProperty("--kk-bg-blur", `${val}px`);
+    });
+    sliderBlur?.addEventListener("change", () => {
+      const val = parseInt(sliderBlur.value, 10);
+      commitUpdate({ ...cfg, island: { ...cfg.island, bgBlurRadiusPx: val } });
+    });
+
+    // Background blur opacity slider
+    const sliderBlurOpacity = document.getElementById("slider-bg-blur-opacity") as HTMLInputElement | null;
+    const valBlurOpacity = document.getElementById("val-bg-blur-opacity");
+    sliderBlurOpacity?.addEventListener("input", () => {
+      const val = parseInt(sliderBlurOpacity.value, 10);
+      if (valBlurOpacity) valBlurOpacity.textContent = `${val}%`;
+      const op = previewMode === "pill" ? (val * 0.007).toFixed(2) : (val / 100).toFixed(2);
+      if (previewGlow) previewGlow.style.opacity = op;
+      document.documentElement.style.setProperty("--kk-bg-blur-opacity", `${val / 100}`);
+      document.documentElement.style.setProperty("--kk-bg-blur-opacity-pill", `${Math.round((val / 100) * 0.7 * 100) / 100}`);
+    });
+    sliderBlurOpacity?.addEventListener("change", () => {
+      const val = parseInt(sliderBlurOpacity.value, 10);
+      commitUpdate({ ...cfg, island: { ...cfg.island, bgBlurOpacity: val } });
     });
 
     // Seekbar style (responsive segmented / select)
@@ -798,14 +757,6 @@ window.addEventListener("DOMContentLoaded", () => {
       commitUpdate({
         ...cfg,
         seekbar: { ...cfg.seekbar, style: val as SeekbarStyle },
-      });
-    });
-
-    // Seekbar height (responsive segmented / select)
-    bindSegmentGroup("group-seekbar-height", (val) => {
-      commitUpdate({
-        ...cfg,
-        seekbar: { ...cfg.seekbar, heightPx: parseInt(val, 10) as 4 | 8 | 12 },
       });
     });
 
@@ -826,15 +777,6 @@ window.addEventListener("DOMContentLoaded", () => {
       });
     });
 
-    // Switch glow
-    const switchGlow = document.getElementById("switch-glow");
-    switchGlow?.addEventListener("click", () => {
-      commitUpdate({
-        ...cfg,
-        seekbar: { ...cfg.seekbar, showHoverGlow: !cfg.seekbar.showHoverGlow },
-      });
-    });
-
     // Switch time labels
     const switchTimeLabels = document.getElementById("switch-timelabels");
     switchTimeLabels?.addEventListener("click", () => {
@@ -849,14 +791,6 @@ window.addEventListener("DOMContentLoaded", () => {
       commitUpdate({
         ...cfg,
         island: { ...cfg.island, panelWidth: val as PanelWidthPreset },
-      });
-    });
-
-    // Corner geometry (responsive segmented / select)
-    bindSegmentGroup("group-corner-radius", (val) => {
-      commitUpdate({
-        ...cfg,
-        island: { ...cfg.island, cornerRadius: val as "pill" | "curved" | "compact" },
       });
     });
 
@@ -899,14 +833,6 @@ window.addEventListener("DOMContentLoaded", () => {
       commitUpdate({
         ...cfg,
         island: { ...cfg.island, springSpeed: val as "snappy" | "balanced" | "gentle" },
-      });
-    });
-
-    // Notch (responsive segmented / select)
-    bindSegmentGroup("group-notch", (val) => {
-      commitUpdate({
-        ...cfg,
-        island: { ...cfg.island, notchOffsetPx: parseInt(val, 10) },
       });
     });
 

@@ -32,6 +32,11 @@ window.addEventListener("DOMContentLoaded", async () => {
   let currentConfig: AppConfig = loadConfig();
   applyThemeToDOM(currentConfig);
 
+  const glowEl = document.getElementById("island-ambient-glow");
+  if (glowEl) {
+    glowEl.style.backgroundImage = "url('/logo.png')";
+  }
+
   const engine = new AudioEngine();
   const fsm = new IslandFSM();
   const view = new IslandView(island);
@@ -350,19 +355,23 @@ window.addEventListener("DOMContentLoaded", async () => {
       }
       eqRafId = requestAnimationFrame(runEqLoop);
     } else {
-      if (eqRafId !== null) {
-        cancelAnimationFrame(eqRafId);
-        eqRafId = null;
-      }
-      const barEls = pill.querySelectorAll<HTMLElement>(".bar");
-      for (let i = 0; i < barEls.length; i++) {
-        barEls[i].style.transform = "scaleY(0.2)";
-      }
-      const orb = pill.querySelector<HTMLElement>(".pulse-orb");
-      if (orb) {
-        orb.style.transform = "scale(0.8)";
-        orb.style.opacity = "0.4";
-      }
+      resetEqVisuals();
+    }
+  }
+
+  function resetEqVisuals() {
+    if (eqRafId !== null) {
+      cancelAnimationFrame(eqRafId);
+      eqRafId = null;
+    }
+    const barEls = pill.querySelectorAll<HTMLElement>(".bar");
+    for (let i = 0; i < barEls.length; i++) {
+      barEls[i].style.transform = "scaleY(0.2)";
+    }
+    const orb = pill.querySelector<HTMLElement>(".pulse-orb");
+    if (orb) {
+      orb.style.transform = "scale(0.8)";
+      orb.style.opacity = "0.4";
     }
   }
 
@@ -372,19 +381,7 @@ window.addEventListener("DOMContentLoaded", async () => {
         eqRafId = requestAnimationFrame(runEqLoop);
       }
     } else {
-      if (eqRafId !== null) {
-        cancelAnimationFrame(eqRafId);
-        eqRafId = null;
-      }
-      const barEls = pill.querySelectorAll<HTMLElement>(".bar");
-      for (let i = 0; i < barEls.length; i++) {
-        barEls[i].style.transform = "scaleY(0.2)";
-      }
-      const orb = pill.querySelector<HTMLElement>(".pulse-orb");
-      if (orb) {
-        orb.style.transform = "scale(0.8)";
-        orb.style.opacity = "0.4";
-      }
+      resetEqVisuals();
     }
   }
 
