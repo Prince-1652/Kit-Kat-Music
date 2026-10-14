@@ -33,6 +33,7 @@ export interface IslandConfigCustom {
   showVolumeControl: boolean;
   skipDurationSecs: 5 | 10 | 15 | 30;
   launchAtStartup: boolean;
+  autoCheckUpdates: boolean;
 }
 
 export interface AppConfig {
@@ -174,6 +175,7 @@ export const DEFAULT_CONFIG: AppConfig = {
     showVolumeControl: true,
     skipDurationSecs: 10,
     launchAtStartup: false,
+    autoCheckUpdates: true,
   },
 };
 
@@ -184,10 +186,13 @@ export function loadConfig(): AppConfig {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return DEFAULT_CONFIG;
     const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+      return DEFAULT_CONFIG;
+    }
     return {
-      theme: { ...DEFAULT_CONFIG.theme, ...parsed.theme },
-      seekbar: { ...DEFAULT_CONFIG.seekbar, ...parsed.seekbar },
-      island: { ...DEFAULT_CONFIG.island, ...parsed.island },
+      theme: { ...DEFAULT_CONFIG.theme, ...(parsed.theme && typeof parsed.theme === "object" ? parsed.theme : {}) },
+      seekbar: { ...DEFAULT_CONFIG.seekbar, ...(parsed.seekbar && typeof parsed.seekbar === "object" ? parsed.seekbar : {}) },
+      island: { ...DEFAULT_CONFIG.island, ...(parsed.island && typeof parsed.island === "object" ? parsed.island : {}) },
     };
   } catch {
     return DEFAULT_CONFIG;
@@ -207,8 +212,8 @@ export function saveConfig(cfg: AppConfig): void {
 }
 
 export function applyThemeToDOM(cfg: AppConfig, root: HTMLElement = document.documentElement): void {
-  const accent = THEME_PRESETS[cfg.theme.accentColor] || THEME_PRESETS["#4ADE80"];
-  const surface = SURFACE_PRESETS[cfg.theme.darkSurface] || SURFACE_PRESETS.oled;
+  const accent = (cfg?.theme?.accentColor && THEME_PRESETS[cfg.theme.accentColor]) || THEME_PRESETS[DEFAULT_CONFIG.theme.accentColor] || THEME_PRESETS["#4ADE80"];
+  const surface = (cfg?.theme?.darkSurface && SURFACE_PRESETS[cfg.theme.darkSurface]) || SURFACE_PRESETS[DEFAULT_CONFIG.theme.darkSurface] || SURFACE_PRESETS.oled;
 
   root.style.setProperty("--kk-primary", accent.primary);
   root.style.setProperty("--kk-primary-hover", accent.hover);

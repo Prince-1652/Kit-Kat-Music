@@ -1,4 +1,5 @@
 import { invoke } from "@tauri-apps/api/core";
+import { listen } from "@tauri-apps/api/event";
 import {
   DEFAULT_CONFIG,
   THEME_PRESETS,
@@ -13,6 +14,21 @@ import {
 } from "./core/config";
 import { renderIcon } from "./core/icons";
 
+interface UpdateInfo {
+  available: boolean;
+  current_version: string;
+  latest_version: string;
+  release_notes: string;
+  download_url?: string;
+  asset_name?: string;
+}
+
+interface UpdateProgress {
+  percent: number;
+  downloaded_bytes: number;
+  total_bytes: number;
+}
+
 window.addEventListener("DOMContentLoaded", () => {
   const root = document.getElementById("settings-root");
   if (!root) return;
@@ -20,6 +36,53 @@ window.addEventListener("DOMContentLoaded", () => {
 
   let cfg: AppConfig = loadConfig();
   applyThemeToDOM(cfg);
+
+  // Updater state
+  let updateStatus: "idle" | "checking" | "available" | "up-to-date" | "downloading" | "error" = "idle";
+  let updateData: UpdateInfo | null = null;
+  let updateErrorMsg = "";
+  let updateProgress: UpdateProgress | null = null;
+
+  function escapeHtml(str: string): string {
+    return str
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  async function performUpdateCheck() {
+    updateStatus = "checking";
+    updateErrorMsg = "";
+    render();
+    try {
+      const info = await invoke<UpdateInfo>("check_for_updates");
+      updateData = info;
+      updateStatus = info.available ? "available" : "up-to-date";
+    } catch (err) {
+      updateStatus = "error";
+      updateErrorMsg = err instanceof Error ? err.message : String(err);
+    }
+    render();
+  }
+
+  async function performInstallUpdate() {
+    if (!updateData || !updateData.download_url) return;
+    updateStatus = "downloading";
+    updateProgress = { percent: 0, downloaded_bytes: 0, total_bytes: 0 };
+    render();
+    try {
+      await invoke("download_and_install_update", {
+        downloadUrl: updateData.download_url,
+        filename: updateData.asset_name || "KitKat-Setup.exe",
+      });
+    } catch (err) {
+      updateStatus = "error";
+      updateErrorMsg = err instanceof Error ? err.message : String(err);
+      render();
+    }
+  }
 
   // Sync startup setting from Windows registry if running inside Tauri
   invoke<boolean>("get_launch_at_startup")
@@ -529,6 +592,101 @@ window.addEventListener("DOMContentLoaded", () => {
             </div>
           </div>
         </section>
+
+        <!-- Section 5: App Updates & Version -->
+        <section class="m3-section">
+          <div class="section-label">App Updates & Version</div>
+          <div class="m3-card">
+            <div class="setting-row">
+              <div class="setting-text">
+                <div class="setting-title">KitKat Version</div>
+                <div class="setting-desc">
+                  Installed: <strong class="version-tag">v${updateData?.current_version || "0.1.0"}</strong>
+                  ${updateStatus === "up-to-date" ? `<span class="update-status-pill success">Up to date</span>` : ""}
+                  ${updateStatus === "available" ? `<span class="update-status-pill available">Update: ${escapeHtml(updateData?.latest_version || "")}</span>` : ""}
+                  ${updateStatus === "checking" ? `<span class="update-status-pill checking">Checking...</span>` : ""}
+                  ${updateStatus === "error" ? `<span class="update-status-pill error">Check failed</span>` : ""}
+                </div>
+              </div>
+              <button id="btn-check-updates" class="btn-check-updates ${updateStatus === "checking" ? "loading" : ""}" ${updateStatus === "checking" || updateStatus === "downloading" ? "disabled" : ""}>
+                ${renderIcon("refreshCw")}
+                <span>${updateStatus === "checking" ? "Checking..." : "Check for Updates"}</span>
+              </button>
+            </div>
+
+            ${
+              updateStatus === "available" && updateData
+                ? `
+              <div class="update-card-banner">
+                <div class="update-banner-header">
+                  <div class="update-banner-title">
+                    ${renderIcon("download")}
+                    <span>KitKat ${escapeHtml(updateData.latest_version)} is available</span>
+                  </div>
+                  <button id="btn-start-install" class="btn-primary btn-install-update">
+                    ${renderIcon("download")}
+                    <span>Download & Install</span>
+                  </button>
+                </div>
+                ${
+                  updateData.release_notes
+                    ? `
+                  <div class="update-release-notes">
+                    <div class="release-notes-label">What's New:</div>
+                    <div class="release-notes-body">${escapeHtml(updateData.release_notes)}</div>
+                  </div>
+                `
+                    : ""
+                }
+              </div>
+            `
+                : ""
+            }
+
+            ${
+              updateStatus === "downloading"
+                ? `
+              <div class="update-card-banner downloading">
+                <div class="update-progress-header">
+                  <span>Downloading installer...</span>
+                  <span class="update-percent">${updateProgress ? updateProgress.percent + "%" : "0%"}</span>
+                </div>
+                <div class="update-progress-track">
+                  <div class="update-progress-fill" style="width: ${updateProgress ? updateProgress.percent : 0}%"></div>
+                </div>
+                <div class="update-progress-sub">
+                  ${
+                    updateProgress && updateProgress.total_bytes > 0
+                      ? `${(updateProgress.downloaded_bytes / (1024 * 1024)).toFixed(1)} MB / ${(updateProgress.total_bytes / (1024 * 1024)).toFixed(1)} MB • Launching installer automatically`
+                      : "Connecting to GitHub..."
+                  }
+                </div>
+              </div>
+            `
+                : ""
+            }
+
+            ${
+              updateStatus === "error"
+                ? `
+              <div class="update-card-banner error">
+                <div class="update-error-text">${renderIcon("wifiOff")} <span>${escapeHtml(updateErrorMsg || "Could not check for updates.")}</span></div>
+              </div>
+            `
+                : ""
+            }
+
+            <div class="setting-row">
+              <div class="setting-text">
+                <div class="setting-title">Auto-Check for Updates</div>
+                <div class="setting-desc">Check GitHub for new releases automatically when opening customization</div>
+              </div>
+              <div class="m3-switch ${cfg.island.autoCheckUpdates ? "active" : ""}" id="switch-autoupdate">
+                <div class="m3-switch-thumb"></div>
+              </div>
+            </div>
+          </div>
+        </section>
       </div>
 
       <footer class="settings-footer">
@@ -782,6 +940,25 @@ window.addEventListener("DOMContentLoaded", () => {
         island: { ...cfg.island, launchAtStartup: nextVal },
       });
     });
+
+    // Check for updates button
+    document.getElementById("btn-check-updates")?.addEventListener("click", () => {
+      performUpdateCheck();
+    });
+
+    // Install update button
+    document.getElementById("btn-start-install")?.addEventListener("click", () => {
+      performInstallUpdate();
+    });
+
+    // Auto-check updates switch
+    const switchAutoUpdate = document.getElementById("switch-autoupdate");
+    switchAutoUpdate?.addEventListener("click", () => {
+      commitUpdate({
+        ...cfg,
+        island: { ...cfg.island, autoCheckUpdates: !cfg.island.autoCheckUpdates },
+      });
+    });
   }
 
   function bindSegmentGroup(groupId: string, onSelect: (val: string) => void) {
@@ -802,6 +979,31 @@ window.addEventListener("DOMContentLoaded", () => {
     select?.addEventListener("change", () => {
       if (select.value) onSelect(select.value);
     });
+  }
+
+  // Listen for background download progress
+  listen<UpdateProgress>("update-download-progress", (event) => {
+    updateProgress = event.payload;
+    if (updateStatus === "downloading") {
+      const fill = document.querySelector<HTMLElement>(".update-progress-fill");
+      const pct = document.querySelector<HTMLElement>(".update-percent");
+      const sub = document.querySelector<HTMLElement>(".update-progress-sub");
+      if (fill) fill.style.width = `${updateProgress.percent}%`;
+      if (pct) pct.textContent = `${updateProgress.percent}%`;
+      if (sub && updateProgress.total_bytes > 0) {
+        sub.textContent = `${(updateProgress.downloaded_bytes / (1024 * 1024)).toFixed(1)} MB / ${(updateProgress.total_bytes / (1024 * 1024)).toFixed(1)} MB • Launching installer automatically`;
+      }
+    }
+  }).catch(() => {});
+
+  // Listen for tray trigger
+  listen("trigger-update-check", () => {
+    performUpdateCheck();
+  }).catch(() => {});
+
+  // Initial auto-check if enabled
+  if (cfg.island.autoCheckUpdates !== false) {
+    performUpdateCheck();
   }
 
   render();

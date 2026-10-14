@@ -1068,3 +1068,221 @@ body {
     justify-content: flex-start;
   }
 }
+
+/* -------------------------------------------------------------
+   App Updates & Version Card
+   ------------------------------------------------------------- */
+.version-tag {
+  font-family: monospace;
+  font-size: 12px;
+  color: var(--kk-text);
+  background: var(--kk-surface-variant);
+  padding: 2px 6px;
+  border-radius: 6px;
+  border: 1px solid var(--kk-outline);
+}
+
+.update-status-pill {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 12px;
+  text-transform: capitalize;
+}
+
+.update-status-pill.success {
+  background: rgba(74, 222, 128, 0.15);
+  color: #4ADE80;
+  border: 1px solid rgba(74, 222, 128, 0.3);
+}
+
+.update-status-pill.available {
+  background: rgba(251, 146, 60, 0.18);
+  color: #FB923C;
+  border: 1px solid rgba(251, 146, 60, 0.35);
+}
+
+.update-status-pill.checking {
+  background: rgba(56, 189, 248, 0.15);
+  color: #38BDF8;
+  border: 1px solid rgba(56, 189, 248, 0.3);
+}
+
+.update-status-pill.error {
+  background: rgba(248, 113, 113, 0.15);
+  color: #F87171;
+  border: 1px solid rgba(248, 113, 113, 0.3);
+}
+
+.btn-check-updates {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: inherit;
+  color: var(--kk-text);
+  background: var(--kk-surface);
+  border: 1px solid var(--kk-outline-variant);
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.btn-check-updates:hover:not(:disabled) {
+  background: var(--kk-surface-hover);
+  border-color: var(--kk-primary-outline);
+  color: var(--kk-primary);
+}
+
+.btn-check-updates:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-check-updates svg {
+  width: 14px;
+  height: 14px;
+}
+
+.btn-check-updates.loading svg {
+  animation: spin-update 1s linear infinite;
+}
+
+@keyframes spin-update {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.update-card-banner {
+  margin: 12px 0;
+  padding: 14px 16px;
+  background: var(--kk-surface-variant);
+  border: 1px solid var(--kk-outline);
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.update-card-banner.error {
+  border-color: rgba(248, 113, 113, 0.3);
+  background: rgba(248, 113, 113, 0.08);
+}
+
+.update-banner-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.update-banner-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--kk-primary);
+}
+
+.update-banner-title svg {
+  width: 16px;
+  height: 16px;
+}
+
+.btn-install-update {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px !important;
+  font-size: 12px !important;
+  border-radius: 16px !important;
+  cursor: pointer;
+}
+
+.btn-install-update svg {
+  width: 14px;
+  height: 14px;
+}
+
+.update-release-notes {
+  border-top: 1px solid var(--kk-outline);
+  padding-top: 10px;
+  font-size: 12px;
+}
+
+.release-notes-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--kk-text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.release-notes-body {
+  color: var(--kk-text);
+  line-height: 1.5;
+  max-height: 120px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 8px 10px;
+  border-radius: 8px;
+}
+
+.update-progress-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--kk-text);
+}
+
+.update-percent {
+  font-weight: 700;
+  color: var(--kk-primary);
+}
+
+.update-progress-track {
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.update-progress-fill {
+  height: 100%;
+  background: var(--kk-primary);
+  border-radius: 3px;
+  transition: width 0.15s ease-out;
+}
+
+.update-progress-sub {
+  font-size: 11px;
+  color: var(--kk-text-dim);
+}
+
+.update-error-text {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #F87171;
+}
+
+.update-error-text svg {
+  width: 16px;
+  height: 16px;
+}
+
