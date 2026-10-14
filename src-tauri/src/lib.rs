@@ -1,4 +1,5 @@
 pub mod tray;
+pub mod updater;
 pub mod window;
 pub mod ytdlp;
 
@@ -42,6 +43,20 @@ async fn search_music(query: String) -> Result<Vec<ytdlp::TrackMetadata>, String
 #[tauri::command]
 async fn get_stream_url(video_id: String) -> Result<ytdlp::StreamPayload, String> {
     ytdlp::extract_stream_url(video_id).await
+}
+
+#[tauri::command]
+async fn check_for_updates() -> Result<updater::UpdateInfo, String> {
+    updater::check_github_update().await
+}
+
+#[tauri::command]
+async fn download_and_install_update(
+    app: AppHandle,
+    download_url: String,
+    filename: String,
+) -> Result<(), String> {
+    updater::download_and_run_installer(app, download_url, filename).await
 }
 
 #[tauri::command]
@@ -151,6 +166,8 @@ pub fn run() {
             close_settings,
             get_launch_at_startup,
             set_launch_at_startup,
+            check_for_updates,
+            download_and_install_update,
         ])
         .run(tauri::generate_context!())
         .expect("error while running KitKat application");
