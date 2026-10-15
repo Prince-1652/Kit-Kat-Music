@@ -6,6 +6,8 @@ export class PlayerControls {
   private isScrubbing = false;
   private skipDuration = 10;
   private showThumb = true;
+  private currentConfig: AppConfig | null = null;
+  private currentTrack: AudioTrack | null = null;
 
   constructor(
     private engine: AudioEngine,
@@ -46,6 +48,17 @@ export class PlayerControls {
       const show = cfg.island.showVolumeControl !== false;
       volGroup.style.display = show ? "flex" : "none";
       bottomRow?.classList.toggle("has-no-vol", !show);
+    }
+    this.currentConfig = cfg;
+    const glowEl = document.getElementById("island-ambient-glow");
+    if (glowEl) {
+      if (cfg.island.albumCoverBgBlur === false) {
+        glowEl.style.display = "none";
+      } else {
+        glowEl.style.display = "block";
+        const thumb = this.currentTrack?.thumbnailUrl || "/logo.png";
+        glowEl.style.backgroundImage = `url('${thumb}')`;
+      }
     }
   }
 
@@ -241,9 +254,15 @@ export class PlayerControls {
       }
     }
 
+    this.currentTrack = track;
     const glowEl = document.getElementById("island-ambient-glow");
     if (glowEl) {
-      glowEl.style.backgroundImage = track.thumbnailUrl ? `url('${track.thumbnailUrl}')` : "none";
+      if (this.currentConfig?.island.albumCoverBgBlur === false) {
+        glowEl.style.display = "none";
+      } else {
+        glowEl.style.display = "block";
+        glowEl.style.backgroundImage = track.thumbnailUrl ? `url('${track.thumbnailUrl}')` : "none";
+      }
     }
   }
 

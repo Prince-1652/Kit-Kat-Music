@@ -34,7 +34,12 @@ window.addEventListener("DOMContentLoaded", async () => {
 
   const glowEl = document.getElementById("island-ambient-glow");
   if (glowEl) {
-    glowEl.style.backgroundImage = "url('/logo.png')";
+    if (currentConfig.island.albumCoverBgBlur === false) {
+      glowEl.style.display = "none";
+    } else {
+      glowEl.style.display = "block";
+      glowEl.style.backgroundImage = "url('/logo.png')";
+    }
   }
 
   const engine = new AudioEngine();

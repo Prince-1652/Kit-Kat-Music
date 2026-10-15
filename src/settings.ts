@@ -180,7 +180,7 @@ window.addEventListener("DOMContentLoaded", () => {
             </div>
           </div>          <div class="preview-stage">
             <div class="island state-${previewMode}" id="preview-island" style="width: ${previewMode === 'pill' ? 280 : (cfg.island.panelWidth === 'compact' ? 520 : cfg.island.panelWidth === 'expanded' ? 640 : 580)}px; height: ${previewMode === 'pill' ? 34 : 136}px; border-radius: 0 0 ${previewMode === 'pill' ? 17 : 28}px ${previewMode === 'pill' ? 17 : 28}px; cursor: ${previewMode === 'pill' ? 'pointer' : 'default'};">
-              <div class="island-ambient-glow" style="background-image: url('/logo.png'); filter: blur(${cfg.island.bgBlurRadiusPx ?? 36}px) saturate(200%) brightness(1.22); opacity: ${previewMode === 'pill' ? ((cfg.island.bgBlurOpacity ?? 62) * 0.007).toFixed(2) : ((cfg.island.bgBlurOpacity ?? 62) / 100).toFixed(2)};"></div>
+              <div class="island-ambient-glow" style="${cfg.island.albumCoverBgBlur === false ? 'display: none;' : ''} background-image: url('/logo.png'); filter: blur(${cfg.island.bgBlurRadiusPx ?? 36}px) saturate(200%) brightness(1.22); opacity: ${previewMode === 'pill' ? ((cfg.island.bgBlurOpacity ?? 62) * 0.007).toFixed(2) : ((cfg.island.bgBlurOpacity ?? 62) / 100).toFixed(2)};"></div>
               <div id="island-wake" class="island-wake"></div>
 
               <div id="island-pill" class="island-pill" style="${previewMode === 'pill' ? 'display: flex;' : 'display: none;'}">
@@ -324,6 +324,16 @@ window.addEventListener("DOMContentLoaded", () => {
               <div class="m3-slider-row">
                 <input type="range" class="m3-slider" id="slider-bg-blur-opacity" min="10" max="100" step="5" value="${cfg.island.bgBlurOpacity ?? 62}" />
                 <span class="m3-slider-value" id="val-bg-blur-opacity">${cfg.island.bgBlurOpacity ?? 62}%</span>
+              </div>
+            </div>
+
+            <div class="setting-row">
+              <div class="setting-text">
+                <div class="setting-title">Album Cover Background Blur</div>
+                <div class="setting-desc">Blur playing album cover in background, or keep pure theme color glow</div>
+              </div>
+              <div class="m3-switch ${cfg.island.albumCoverBgBlur !== false ? "active" : ""}" id="switch-album-cover-blur">
+                <div class="m3-switch-thumb"></div>
               </div>
             </div>
 
@@ -774,12 +784,12 @@ window.addEventListener("DOMContentLoaded", () => {
       const shadowBlur = Math.round((24 * val) / 85);
       const shadowY = Math.round((12 * val) / 85);
       const shadowCss = val === 0
-        ? "0 0 0 0 transparent"
+        ? "none"
         : `0 ${shadowY}px ${shadowBlur}px -6px rgba(0, 0, 0, ${shadowAlpha})`;
       document.documentElement.style.setProperty("--kk-island-drop-shadow", shadowCss);
       document.documentElement.style.setProperty("--kk-drop-shadow-opacity", shadowAlpha);
       if (previewIslandEl) {
-        previewIslandEl.style.boxShadow = `0 7px 0 0 #050508, 0 8px 0 0 rgba(var(--kk-primary-rgb), 0.15), 0 16px 24px -2px rgba(var(--kk-primary-rgb), 0.22), ${shadowCss}`;
+        previewIslandEl.style.boxShadow = shadowCss;
       }
     });
     sliderDropShadow?.addEventListener("change", () => {
@@ -834,6 +844,16 @@ window.addEventListener("DOMContentLoaded", () => {
       commitUpdate({
         ...cfg,
         island: { ...cfg.island, artworkShape: val as ArtworkShapePreset },
+      });
+    });
+
+    // Album cover background blur switch
+    const switchAlbumCoverBlur = document.getElementById("switch-album-cover-blur");
+    switchAlbumCoverBlur?.addEventListener("click", () => {
+      const current = cfg.island.albumCoverBgBlur !== false;
+      commitUpdate({
+        ...cfg,
+        island: { ...cfg.island, albumCoverBgBlur: !current },
       });
     });
 
