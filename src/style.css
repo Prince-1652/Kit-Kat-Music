@@ -152,15 +152,18 @@ body {
   background-image: 
     radial-gradient(
       ellipse 95% 75% at 50% 112%,
-      var(--kk-glow-core, rgba(74, 222, 128, 0.54)) 0%,
-      var(--kk-glow-mid, rgba(74, 222, 128, 0.22)) 38%,
-      var(--kk-glow-subtle, rgba(74, 222, 128, 0.06)) 64%,
-      transparent 82%
+      rgba(255, 255, 255, 0.75) 0%,
+      rgba(255, 255, 255, 0.40) 8%,
+      var(--kk-glow-core, rgba(74, 222, 128, 0.54)) 22%,
+      var(--kk-glow-mid, rgba(74, 222, 128, 0.22)) 46%,
+      var(--kk-glow-subtle, rgba(74, 222, 128, 0.06)) 68%,
+      transparent 84%
     ),
     radial-gradient(
       ellipse 130% 90% at 50% 122%,
-      var(--kk-glow-mid, rgba(74, 222, 128, 0.18)) 0%,
-      var(--kk-glow-subtle, rgba(74, 222, 128, 0.05)) 48%,
+      rgba(255, 255, 255, 0.30) 0%,
+      var(--kk-glow-mid, rgba(74, 222, 128, 0.18)) 24%,
+      var(--kk-glow-subtle, rgba(74, 222, 128, 0.05)) 50%,
       transparent 78%
     );
   pointer-events: none;
@@ -258,8 +261,10 @@ body {
 .island.state-pill::before {
   background-image: radial-gradient(
     ellipse 100% 120% at 50% 130%,
-    var(--kk-glow-core, rgba(74, 222, 128, 0.54)) 0%,
-    var(--kk-glow-mid, rgba(74, 222, 128, 0.20)) 45%,
+    rgba(255, 255, 255, 0.70) 0%,
+    rgba(255, 255, 255, 0.35) 10%,
+    var(--kk-glow-core, rgba(74, 222, 128, 0.54)) 26%,
+    var(--kk-glow-mid, rgba(74, 222, 128, 0.20)) 50%,
     transparent 85%
   );
 }
