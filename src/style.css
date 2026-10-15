@@ -127,7 +127,7 @@ body {
 .island-ambient-glow {
   position: absolute;
   inset: -10px;
-  filter: blur(var(--kk-bg-blur, 36px)) saturate(200%) brightness(1.22);
+  filter: blur(var(--kk-bg-blur, 36px)) saturate(var(--kk-bg-blur-saturation, 200%)) brightness(1.22);
   opacity: 0;
   display: var(--kk-cover-glow-display, block);
   transition: opacity 0.48s cubic-bezier(0.32, 0.72, 0, 1), filter 0.25s ease;
@@ -151,20 +151,23 @@ body {
   inset: 0;
   background-image: 
     radial-gradient(
-      ellipse 95% 75% at 50% 112%,
-      rgba(255, 255, 255, 0.75) 0%,
-      rgba(255, 255, 255, 0.40) 8%,
-      var(--kk-glow-core, rgba(74, 222, 128, 0.54)) 22%,
-      var(--kk-glow-mid, rgba(74, 222, 128, 0.22)) 46%,
-      var(--kk-glow-subtle, rgba(74, 222, 128, 0.06)) 68%,
-      transparent 84%
+      ellipse 95% 54% at 50% 102%,
+      #FFFFFF 0%,
+      rgba(255, 255, 255, 0.98) 7%,
+      var(--kk-primary) 26%,
+      var(--kk-glow-core, rgba(74, 222, 128, 0.54)) 42%,
+      var(--kk-glow-mid, rgba(74, 222, 128, 0.22)) 58%,
+      var(--kk-glow-subtle, rgba(74, 222, 128, 0.08)) 72%,
+      rgba(var(--kk-primary-rgb, 74, 222, 128), 0.02) 86%,
+      transparent 95%
     ),
     radial-gradient(
-      ellipse 130% 90% at 50% 122%,
-      rgba(255, 255, 255, 0.30) 0%,
-      var(--kk-glow-mid, rgba(74, 222, 128, 0.18)) 24%,
-      var(--kk-glow-subtle, rgba(74, 222, 128, 0.05)) 50%,
-      transparent 78%
+      ellipse 130% 80% at 50% 104%,
+      var(--kk-glow-core, rgba(74, 222, 128, 0.42)) 0%,
+      var(--kk-glow-mid, rgba(74, 222, 128, 0.20)) 32%,
+      var(--kk-glow-subtle, rgba(74, 222, 128, 0.07)) 58%,
+      rgba(var(--kk-primary-rgb, 74, 222, 128), 0.02) 78%,
+      transparent 92%
     );
   pointer-events: none;
   z-index: 0;
@@ -197,9 +200,10 @@ body {
   opacity: 1;
   cursor: pointer;
   background: #000000;
-  box-shadow: 
-    0 4px 12px rgba(0, 0, 0, 0.9),
-    0 0 10px -2px var(--kk-glow-halo, rgba(74, 222, 128, 0.25));
+  box-shadow: var(
+    --kk-island-drop-shadow-hidden,
+    0 4px 12px rgba(0, 0, 0, 0.9)
+  );
 }
 
 .island.state-hidden #island-panel {
@@ -253,19 +257,23 @@ body {
   border-radius: 0 0 17px 17px;
   cursor: pointer;
   border: none;
-  box-shadow: 
-    0 8px 18px -4px rgba(0, 0, 0, 0.85),
-    0 0 14px -2px var(--kk-glow-halo, rgba(74, 222, 128, 0.28));
+  box-shadow: var(
+    --kk-island-drop-shadow-pill,
+    0 8px 18px -4px rgba(0, 0, 0, 0.85)
+  );
 }
 
 .island.state-pill::before {
   background-image: radial-gradient(
-    ellipse 100% 120% at 50% 130%,
-    rgba(255, 255, 255, 0.70) 0%,
-    rgba(255, 255, 255, 0.35) 10%,
-    var(--kk-glow-core, rgba(74, 222, 128, 0.54)) 26%,
-    var(--kk-glow-mid, rgba(74, 222, 128, 0.20)) 50%,
-    transparent 85%
+    ellipse 100% 100% at 50% 104%,
+    #FFFFFF 0%,
+    rgba(255, 255, 255, 0.96) 8%,
+    var(--kk-primary) 28%,
+    var(--kk-glow-core, rgba(74, 222, 128, 0.54)) 46%,
+    var(--kk-glow-mid, rgba(74, 222, 128, 0.20)) 64%,
+    var(--kk-glow-subtle, rgba(74, 222, 128, 0.06)) 78%,
+    rgba(var(--kk-primary-rgb, 74, 222, 128), 0.015) 88%,
+    transparent 96%
   );
 }
 
@@ -301,6 +309,16 @@ body {
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.12);
   box-sizing: border-box;
+}
+
+.pill-thumb.is-logo,
+.pill-thumb[style*="logo.png"] {
+  background-color: transparent !important;
+  border: none !important;
+  background-size: contain;
+  background-repeat: no-repeat;
+  overflow: visible;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, calc(var(--kk-drop-shadow-opacity, 0.85) * 0.45)));
 }
 
 .pill-thumb .icon {
@@ -955,6 +973,13 @@ body {
   box-shadow: var(--kk-art-glow, 0 8px 24px -4px rgba(0, 0, 0, 0.75));
 }
 
+.album-art-wrap.has-placeholder,
+.album-art-wrap:has(#art-placeholder),
+.album-art-wrap:has(.placeholder-logo) {
+  box-shadow: none !important;
+  overflow: visible;
+}
+
 .album-art-wrap img {
   width: 100%;
   height: 100%;
@@ -973,16 +998,17 @@ body {
   justify-content: center;
   background: transparent;
   border-radius: inherit;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .placeholder-logo {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   object-position: center;
   border-radius: inherit;
   display: block;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.45));
 }
 
 .player-details {
@@ -1034,11 +1060,14 @@ body {
   display: flex;
   align-items: center;
   gap: 6px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(14, 15, 22, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 9999px;
   padding: 2px 8px 2px 4px;
-  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.06);
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(8px);
   height: 22px;
 }
 
@@ -1368,9 +1397,9 @@ body {
 .btn-icon {
   width: 32px;
   height: 32px;
-  background: rgba(255, 255, 255, 0.10);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: rgba(255, 255, 255, 0.85);
+  background: rgba(14, 15, 22, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #FFFFFF;
   cursor: pointer;
   padding: 0;
   border-radius: 50%;
@@ -1378,20 +1407,27 @@ body {
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
-  transition: background-color 0.15s cubic-bezier(0.32, 0.72, 0, 1), transform 0.1s cubic-bezier(0.32, 0.72, 0, 1), color 0.15s, border-color 0.15s;
+  backdrop-filter: blur(8px);
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.14);
+  transition: background-color 0.15s cubic-bezier(0.32, 0.72, 0, 1), transform 0.1s cubic-bezier(0.32, 0.72, 0, 1), color 0.15s, border-color 0.15s, box-shadow 0.15s;
 }
 
 .btn-icon:hover {
-  background: rgba(255, 255, 255, 0.16);
+  background: rgba(24, 26, 36, 0.90);
   color: #FFFFFF;
-  border-color: rgba(255, 255, 255, 0.20);
+  border-color: rgba(255, 255, 255, 0.28);
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.65),
+    0 0 10px rgba(var(--kk-primary-rgb), 0.25),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.20);
   transform: scale(1.08);
 }
 
 .btn-icon:active {
-  background: rgba(255, 255, 255, 0.22);
-  transform: scale(0.90);
+  background: rgba(10, 11, 16, 0.95);
+  transform: scale(0.92);
 }
 
 .btn-icon:focus-visible {
@@ -1414,14 +1450,17 @@ body {
   border-radius: 50%;
   background: #FFFFFF;
   color: #000000;
-  border: none;
+  border: 1px solid rgba(255, 255, 255, 0.90);
   cursor: pointer;
   padding: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  box-shadow: 
+    0 4px 14px rgba(0, 0, 0, 0.65),
+    0 0 14px -2px rgba(var(--kk-primary-rgb), 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
   transition: transform 0.15s cubic-bezier(0.32, 0.72, 0, 1), box-shadow 0.15s ease, background-color 0.15s;
   flex-shrink: 0;
 }
@@ -1429,7 +1468,9 @@ body {
 .btn-play-glyph:hover {
   transform: scale(1.08);
   background: #FFFFFF;
-  box-shadow: 0 6px 20px rgba(255, 255, 255, 0.35);
+  box-shadow: 
+    0 6px 20px rgba(0, 0, 0, 0.75),
+    0 0 20px rgba(var(--kk-primary-rgb), 0.45);
 }
 
 .btn-play-glyph:active {

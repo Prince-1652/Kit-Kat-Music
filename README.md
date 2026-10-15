@@ -1,107 +1,129 @@
 # KitKat Music
 
-KitKat Music is a lightweight, hardware-accelerated Dynamic Island desktop music player for Windows. Built on Tauri v2 and Rust, it provides a persistent top-of-screen interface that seamlessly expands from a discreet notch strip into a compact status pill or a full-featured music dashboard.
+<p align="center">
+  <img src="public/logo.png" alt="KitKat Music Logo" width="128" height="128" />
+</p>
+
+<p align="center">
+  <strong>Dynamic Island Desktop Music Player for Windows</strong>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Platform-Windows%2010%20%7C%2011-0078D6?logo=windows&logoColor=white" alt="Platform" />
+  <img src="https://img.shields.io/badge/Framework-Tauri%20v2-24C8D8?logo=tauri&logoColor=white" alt="Tauri v2" />
+  <img src="https://img.shields.io/badge/Language-Rust%20%7C%20TypeScript-DEA584?logo=rust&logoColor=white" alt="Rust & TypeScript" />
+  <img src="https://img.shields.io/badge/Version-v1.2.0-blue" alt="Version 1.2.0" />
+  <img src="https://img.shields.io/badge/License-MIT-green" alt="License MIT" />
+</p>
 
 ---
 
 ## Overview
 
-Traditional desktop music players require dedicated taskbar space or bulky floating windows. KitKat Music adopts the Dynamic Island paradigm:
-- Anchored directly beneath the top screen edge or display notch.
-- Uses native OS transparent click-through hit-testing so only the active island captures input, keeping surrounding monitor space fully interactive.
-- Driven by a finite state machine with second-order spring dynamics for fluid fluid transitions.
+**KitKat Music** brings the modern Dynamic Island interaction paradigm to Windows 10 and 11. Instead of cluttering your taskbar with heavy playback windows, KitKat lives right at the top of your screen as a hardware-accelerated, floating dynamic notch.
+
+It smoothly morphs between a discreet wake strip, an ambient music pill, and an expanded dashboard with YouTube music search, animated waveforms, dynamic album glow, and hardware media key integration.
+
+KitKat uses native Win32 window clipping (`SetWindowRgn`) and click-through hit testing. When minimized, surrounding screen space remains fully interactive without obstruction.
 
 ---
 
-## Features
+## Key Features
 
-### Adaptive Island States
-- **Wake Strip**: A minimal 6px notch indicator at the top of the display when idle or minimized. Hovering or clicking smoothly wakes the player.
-- **Status Pill**: A compact 34px rounded pill displaying current song title, thumbnail, and live audio visualizer equalizer (dancing bars, wave, or beat pulse).
-- **Expanded Panel**: A full playback dashboard with track search, volume control, animated seekbar, and transport controls.
-- **Search Panel**: Instant in-app song search with debounced YouTube query extraction, allowing track selection directly from the island.
+### 1. Dynamic Island Adaptive States
+- **Wake Strip**: A clean 6px notch indicator resting at the display's top edge when minimized or idle.
+- **Status Pill**: A compact 34px floating capsule displaying track details, album art, and real-time audio visualizers (Dancing Bars, Smooth Wave, or Beat Pulse).
+- **Expanded Dashboard**: Full playback controls, animated scrubbers, volume controls, search access, and customization.
+- **In-Island YouTube Search**: Search tracks and artists directly inside the island with debounced extraction and instant streaming.
 
-### Fluid Playback & Audio Pipeline
-- Standalone HTML5 Audio engine integrated with native OS Media Session API (supports keyboard media keys: Play/Pause, Next Track, Previous Track).
-- Automated yt-dlp stream extraction with cache and automatic format resolution.
-- Configurable skip forward and backward durations (5s, 10s, 15s, 30s).
+### 2. Audio Pipeline & YouTube Streaming
+- **HTML5 Web Audio Engine**: Gapless playback with automated stream format negotiation (`yt-dlp`).
+- **Progressive Stream Resolution**: Prioritizes fast, buffer-free direct HTTPS progressive streams (`m4a`, `mp4`).
+- **Media Session API**: Works seamlessly with hardware media keys (Play/Pause, Next Track, Previous Track, Seek).
+- **Configurable Seek Jumps**: 5s, 10s, 15s, or 30s jump increments.
 
-### Customization Dashboard
-A dedicated settings application (`KitKat Customization`) accessible via the gear icon or system tray:
-- **Themes & Surfaces**: Customizable accent colors, OLED pure black / deep night / charcoal surfaces, and frosted glass (acrylic blur) materials.
-- **Seekbar Styles**: Continuous classic bar, squiggly animated wave, still wave, and dotted bar modes.
-- **Geometry & Sizing**: Configurable panel width presets (Compact 520px, Standard 580px, Wide 640px), adjustable corner roundness, and album art corner radius presets.
-- **Behavior**: Auto-minimize timers, spring animation speeds (Snappy, Smooth, Gentle), and top notch offset adjustments.
+### 3. Ambient Glow & Visual Craft
+- **Dynamic Ambient Blur Bleed**: Soft atmospheric glow reflecting the current playing album cover.
+- **Fine-Grained Blur Controls**: 3 independent M3 sliders for Background Blur Radius, Blur Opacity, and Color Saturation, with a single master toggle.
+- **Horizon Eclipse Backlit Bloom**: Multi-stop radial gradients creating a hardware bezel glow.
+- **Zeroable Island Drop Shadows**: Fully customizable, black-only elevation shadow across all island states.
+- **Squiggly Waveform Progress**: Choose between an animated squiggly wave, still wave, continuous classic bar, or dotted seekbar.
 
-### System Tray & Background Operation
-- Runs discreetly in the Windows notification area with a custom tray icon.
-- Context menu options to quickly Toggle Island, Open Settings, or Exit.
-- Automatically handles click-outside events and Windows blur triggers to tuck back into a pill.
+### 4. Customization & Theming
+- **Luminous Bento Settings**: Dedicated customization app with live interactive preview.
+- **Canvases**: Pure Black (OLED), Deep Night, and Charcoal.
+- **Accent Presets**: Curated palette (Mint Emerald, Sky Cyan, Coral Flame, Amber Gold, Lavender, Rose, Lime, Slate).
+- **Physics Customization**: Second-order implicit Euler spring animation dynamics (Snappy, Balanced, or Gentle).
+- **Window Geometry**: Configurable panel widths (Compact 520px, Standard 580px, Wide 640px) and notch offsets.
+
+### 5. System Tray & Silent Updates
+- **System Tray**: Context menu to toggle the island, open settings, or exit.
+- **Auto-Minimize**: Automatically tucks back into a compact pill after customizable idle timeouts (Never, 5s, 10s, 15s).
+- **Background Auto-Updater**: Directly connects to GitHub releases, downloads NSIS installers, and updates automatically.
 
 ---
 
 ## Tech Stack
 
-- **Core Framework**: Tauri v2 (Rust backend + WebView2 frontend)
-- **Frontend**: TypeScript, Vanilla CSS (Design Tokens), Vite 6
-- **Window Management**: Win32 native APIs (`SetWindowLongPtrW`, `SetWindowPos`, `SetWindowRgn` for precise hit-test clipping)
-- **Audio & Media**: HTML5 Web Audio, OS System Media Transport Controls, yt-dlp CLI
-- **Physics**: Custom second-order implicit Euler spring animation engine
-
----
-
-## Prerequisites
-
-Before building from source, ensure the following tools are installed on your system:
-
-1. **Node.js** (v18 or higher) and `npm`.
-2. **Rust** (stable toolchain) via [rustup](https://rustup.rs/).
-3. **yt-dlp**: Required for audio stream extraction. Ensure `yt-dlp` is available in your system `PATH`.
-4. **C++ Build Tools**: Visual Studio C++ Build Tools or Windows SDK (standard for Rust on Windows).
+| Component | Technology | Purpose |
+| :--- | :--- | :--- |
+| **Backend & Runtime** | Tauri v2 & Rust | Lightweight OS integration, IPC, native window shaping, tray icon |
+| **Frontend** | TypeScript & Vite | High-performance reactive UI rendering |
+| **Styles** | Vanilla CSS (Design Tokens) | Glassmorphism, CSS variables, and GPU-accelerated transforms |
+| **Physics** | Custom Coucou Engine | Second-order implicit Euler spring animation equations |
+| **Audio Extraction** | yt-dlp & Node.js Runtime | YouTube audio streaming and query resolution |
+| **OS Windowing** | Win32 API (`user32.dll`) | Non-rectangular window clipping, click-through transparency |
 
 ---
 
 ## Getting Started
 
-### 1. Clone the Repository
-```bash
-git clone https://github.com/Prince-1652/Kit-Kat-Music.git
-cd Kit-Kat-Music
-```
+### Prerequisites
+- **Windows 10 or 11** (64-bit)
+- **Node.js** (v18 or later) & `npm`
+- **Rust Toolchain**: Install via [rustup.rs](https://rustup.rs/)
+- **yt-dlp**: Available in your system `PATH` (used for audio extraction)
+- **Visual Studio C++ Build Tools** (Standard for Rust Windows compilation)
 
-### 2. Install Dependencies
-```bash
-npm install
-```
+### Development
 
-### 3. Run in Development Mode
-To start the Vite development server with Tauri live-reload:
-```bash
-npm run tauri dev
-```
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/Prince-1652/Kit-Kat-Music.git
+   cd Kit-Kat-Music
+   ```
 
-### 4. Run Unit Tests
-To run the automated test suite (spring physics, layout consistency, and stream verification):
-```bash
-npm test
-```
+2. **Install frontend dependencies:**
+   ```bash
+   npm install
+   ```
+
+3. **Run the dev server with live-reload:**
+   ```bash
+   npm run tauri dev
+   ```
+
+4. **Execute automated test suites:**
+   ```bash
+   npm test
+   ```
 
 ---
 
 ## Building the Executable (.exe)
 
-To generate an optimized, standalone Windows binary and installer:
+To compile a release build and generate a standalone Windows installer:
 
 ```bash
 npm run tauri build
 ```
 
-The compiled binaries will be output to:
+The output artifacts will be located at:
 ```text
 src-tauri/target/release/
-  kitkat-desktop.exe                  # Standalone portable executable
-  bundle/nsis/
-    KitKat_0.1.0_x64-setup.exe        # Windows NSIS Setup Installer (3.96 MB)
+├── kitkat-desktop.exe             # Portable standalone executable
+└── bundle/nsis/
+    └── KitKat_1.2.0_x64-setup.exe # Standard Windows installer
 ```
 
 ---
@@ -111,39 +133,54 @@ src-tauri/target/release/
 ```text
 Kit-Kat-Music/
 ├── public/
-│   └── logo.png                # Application branding logo
+│   └── logo.png             # Application branding logo
 ├── src/
 │   ├── core/
-│   │   ├── anim.ts             # Spring physics simulation
-│   │   ├── audio.ts            # HTML5 audio player engine
-│   │   ├── config.ts           # Config schema, tokens, and storage
-│   │   ├── icons.ts            # SVG icon definitions
-│   │   └── media_session.ts    # Hardware media key integration
+│   │   ├── anim.ts          # Coucou spring physics engine
+│   │   ├── audio.ts         # HTML5 Web Audio playback engine
+│   │   ├── config.ts        # App configuration, CSS design tokens, and persistence
+│   │   ├── icons.ts         # Lightweight SVG icon pack
+│   │   └── media_session.ts # OS System Media Transport Controls integration
 │   ├── island/
-│   │   ├── fsm.ts              # Finite state machine (Hidden / Pill / Panel)
-│   │   └── view.ts             # Window bounds synchronization and layout
+│   │   ├── fsm.ts           # Island Finite State Machine (Hidden / Pill / Panel)
+│   │   └── view.ts          # Window bounds synchronization and layout geometry
 │   ├── player/
-│   │   ├── controls.ts         # Playback controls and seekbars
-│   │   └── search.ts           # Song search manager and query debouncing
-│   ├── main.ts                 # Main island entry point
-│   ├── settings.ts             # Customization dashboard entry point
-│   ├── settings.css            # Customization dashboard styles
-│   └── style.css               # Dynamic island layout and animations
+│   │   ├── controls.ts      # Playback controls and seekbars
+│   │   └── search.ts        # In-island YouTube search and query debouncing
+│   ├── main.ts              # Island entry point and IPC orchestration
+│   ├── settings.ts          # Luminous Bento customization dashboard
+│   ├── settings.css         # Customization dashboard design tokens and layouts
+│   └── style.css            # Dynamic Island styling, glow layers, and animations
 ├── src-tauri/
 │   ├── src/
-│   │   ├── lib.rs              # Tauri command registrations and setup
-│   │   ├── tray.rs             # Windows system tray configuration
-│   │   ├── window.rs           # Native Win32 window clipping & click-through
-│   │   └── ytdlp.rs            # Audio stream extraction IPC handler
-│   ├── tauri.conf.json         # Tauri application and window configurations
-│   └── Cargo.toml              # Rust crate dependencies
-├── tests/                      # Automated test suite
+│   │   ├── lib.rs           # Tauri command registrations, updater IPC, and app setup
+│   │   ├── tray.rs          # Windows system notification area tray configuration
+│   │   ├── window.rs        # Win32 native window clipping and hit-testing
+│   │   └── ytdlp.rs         # yt-dlp audio stream extraction and process manager
+│   ├── tauri.conf.json      # Tauri application and window configurations
+│   └── Cargo.toml           # Rust crate dependencies and build configuration
+├── tests/                   # Automated Node.js unit tests
 ├── package.json
 └── vite.config.ts
 ```
 
 ---
 
+## Keyboard Controls & Interactions
+
+| Action | Control |
+| :--- | :--- |
+| **Play / Pause** | `Spacebar` / Media Play-Pause Key |
+| **Next / Previous Track** | `MediaNextTrack` / `MediaPreviousTrack` |
+| **Seek Forward / Back** | Custom skip button (5s / 10s / 15s / 30s) |
+| **Wake Island** | Hover top notch or click wake strip |
+| **Expand / Minimize** | Click anywhere on the island pill |
+| **Search Music** | Click the search bar in the expanded panel |
+| **Open Customization** | Click gear icon in panel or right-click Tray Icon |
+
+---
+
 ## License
 
-This project is licensed under the MIT License. See the LICENSE file for details.
+This project is licensed under the [MIT License](LICENSE).
+Distributed freely for personal and community use.

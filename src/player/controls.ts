@@ -65,7 +65,7 @@ export class PlayerControls {
   render(): void {
     this.container.innerHTML = `
       <div class="player-main">
-        <div class="album-art-wrap" id="player-art-wrap">
+        <div class="album-art-wrap has-placeholder" id="player-art-wrap">
           <img id="player-art" src="" style="display:none;" />
           <div id="art-placeholder"><img src="/logo.png" class="placeholder-logo" alt="KitKat" /></div>
         </div>
@@ -106,6 +106,7 @@ export class PlayerControls {
     artImg?.addEventListener("error", () => {
       artImg.style.display = "none";
       if (placeholder) placeholder.style.display = "block";
+      this.container.querySelector("#player-art-wrap")?.classList.add("has-placeholder");
     });
 
     const playBtn = this.container.querySelector("#btn-play") as HTMLButtonElement;
@@ -248,9 +249,11 @@ export class PlayerControls {
         artImg.src = track.thumbnailUrl;
         artImg.style.display = "block";
         if (placeholder) placeholder.style.display = "none";
+        artWrap?.classList.remove("has-placeholder");
       } else {
         artImg.style.display = "none";
         if (placeholder) placeholder.style.display = "block";
+        artWrap?.classList.add("has-placeholder");
       }
     }
 

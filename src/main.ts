@@ -167,7 +167,7 @@ window.addEventListener("DOMContentLoaded", async () => {
 
   // Render Pill content
   pill.innerHTML = `
-    <div class="pill-thumb" id="pill-thumb" style="background-image: url('/logo.png');"></div>
+    <div class="pill-thumb is-logo" id="pill-thumb" style="background-image: url('/logo.png');"></div>
     <div class="pill-title" id="pill-title">KitKat Music</div>
     <div class="pill-eq" id="pill-eq">
       <span class="bar"></span><span class="bar"></span>
@@ -299,7 +299,13 @@ window.addEventListener("DOMContentLoaded", async () => {
       if (pillTitle) pillTitle.textContent = `${track.title} • ${track.uploader}`;
       const pillThumb = document.getElementById("pill-thumb");
       if (pillThumb) {
-        pillThumb.style.backgroundImage = track.thumbnail_url ? `url('${track.thumbnail_url}')` : "url('/logo.png')";
+        if (track.thumbnail_url) {
+          pillThumb.style.backgroundImage = `url('${track.thumbnail_url}')`;
+          pillThumb.classList.remove("is-logo");
+        } else {
+          pillThumb.style.backgroundImage = "url('/logo.png')";
+          pillThumb.classList.add("is-logo");
+        }
       }
 
       // Clear search list once playing

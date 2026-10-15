@@ -36,6 +36,7 @@ export interface IslandConfigCustom {
   autoCheckUpdates: boolean;
   bgBlurRadiusPx: number;
   bgBlurOpacity: number;
+  bgBlurSaturation?: number;
   dropShadow: number;
   albumCoverBgBlur: boolean;
 }
@@ -182,6 +183,7 @@ export const DEFAULT_CONFIG: AppConfig = {
     autoCheckUpdates: true,
     bgBlurRadiusPx: 36,
     bgBlurOpacity: 62,
+    bgBlurSaturation: 200,
     dropShadow: 85,
     albumCoverBgBlur: true,
   },
@@ -257,9 +259,11 @@ export function applyThemeToDOM(cfg: AppConfig, root: HTMLElement = document.doc
   const blurPx = cfg?.island?.bgBlurRadiusPx ?? 36;
   const blurOpacityPercent = cfg?.island?.bgBlurOpacity ?? 62;
   const blurOpacity = blurOpacityPercent / 100;
+  const blurSaturation = cfg?.island?.bgBlurSaturation ?? 200;
   root.style.setProperty("--kk-bg-blur", `${blurPx}px`);
   root.style.setProperty("--kk-bg-blur-opacity", `${blurOpacity}`);
   root.style.setProperty("--kk-bg-blur-opacity-pill", `${Math.round(blurOpacity * 0.7 * 100) / 100}`);
+  root.style.setProperty("--kk-bg-blur-saturation", `${blurSaturation}%`);
 
   const showCoverBlur = cfg?.island?.albumCoverBgBlur !== false;
   if (!showCoverBlur) {
@@ -274,12 +278,31 @@ export function applyThemeToDOM(cfg: AppConfig, root: HTMLElement = document.doc
   const shadowAlpha = (shadowPercent / 100).toFixed(2);
   const shadowBlur = Math.round((24 * shadowPercent) / 85);
   const shadowY = Math.round((12 * shadowPercent) / 85);
+
+  const shadowBlurPill = Math.round((18 * shadowPercent) / 85);
+  const shadowYPill = Math.round((8 * shadowPercent) / 85);
+
+  const shadowBlurHidden = Math.round((12 * shadowPercent) / 85);
+  const shadowYHidden = Math.round((4 * shadowPercent) / 85);
+
   root.style.setProperty("--kk-drop-shadow-opacity", shadowAlpha);
   root.style.setProperty(
     "--kk-island-drop-shadow",
     shadowPercent === 0
       ? "none"
       : `0 ${shadowY}px ${shadowBlur}px -6px rgba(0, 0, 0, ${shadowAlpha})`
+  );
+  root.style.setProperty(
+    "--kk-island-drop-shadow-pill",
+    shadowPercent === 0
+      ? "none"
+      : `0 ${shadowYPill}px ${shadowBlurPill}px -4px rgba(0, 0, 0, ${shadowAlpha})`
+  );
+  root.style.setProperty(
+    "--kk-island-drop-shadow-hidden",
+    shadowPercent === 0
+      ? "none"
+      : `0 ${shadowYHidden}px ${shadowBlurHidden}px rgba(0, 0, 0, ${shadowAlpha})`
   );
 
   if (cfg.seekbar.showHoverGlow) {

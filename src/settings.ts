@@ -180,11 +180,11 @@ window.addEventListener("DOMContentLoaded", () => {
             </div>
           </div>          <div class="preview-stage">
             <div class="island state-${previewMode}" id="preview-island" style="width: ${previewMode === 'pill' ? 280 : (cfg.island.panelWidth === 'compact' ? 520 : cfg.island.panelWidth === 'expanded' ? 640 : 580)}px; height: ${previewMode === 'pill' ? 34 : 136}px; border-radius: 0 0 ${previewMode === 'pill' ? 17 : 28}px ${previewMode === 'pill' ? 17 : 28}px; cursor: ${previewMode === 'pill' ? 'pointer' : 'default'};">
-              <div class="island-ambient-glow" style="${cfg.island.albumCoverBgBlur === false ? 'display: none;' : ''} background-image: url('/logo.png'); filter: blur(${cfg.island.bgBlurRadiusPx ?? 36}px) saturate(200%) brightness(1.22); opacity: ${previewMode === 'pill' ? ((cfg.island.bgBlurOpacity ?? 62) * 0.007).toFixed(2) : ((cfg.island.bgBlurOpacity ?? 62) / 100).toFixed(2)};"></div>
+              <div class="island-ambient-glow" style="${cfg.island.albumCoverBgBlur === false ? 'display: none;' : ''} background-image: url('/logo.png'); filter: blur(${cfg.island.bgBlurRadiusPx ?? 36}px) saturate(${cfg.island.bgBlurSaturation ?? 200}%) brightness(1.22); opacity: ${previewMode === 'pill' ? ((cfg.island.bgBlurOpacity ?? 62) * 0.007).toFixed(2) : ((cfg.island.bgBlurOpacity ?? 62) / 100).toFixed(2)};"></div>
               <div id="island-wake" class="island-wake"></div>
 
               <div id="island-pill" class="island-pill" style="${previewMode === 'pill' ? 'display: flex;' : 'display: none;'}">
-                <div class="pill-thumb ${cfg.island.eqStyle === 'pulse' ? 'has-pulse' : ''}" style="background-image: url('/logo.png');"></div>
+                <div class="pill-thumb is-logo ${cfg.island.eqStyle === 'pulse' ? 'has-pulse' : ''}" style="background-image: url('/logo.png');"></div>
                 <div class="pill-title">KitKat Music</div>
                 <div class="pill-eq style-${cfg.island.eqStyle} ${previewPlaying && cfg.island.eqStyle !== 'off' ? 'animated' : ''}" style="${cfg.island.eqStyle === 'off' ? 'display: none;' : ''}">
                   ${
@@ -213,8 +213,8 @@ window.addEventListener("DOMContentLoaded", () => {
 
                 <div id="player-controls-container">
                   <div class="player-main">
-                    <div class="album-art-wrap ${previewPlaying ? 'is-playing' : ''}">
-                      <img src="/logo.png" style="display: block; border-radius: inherit; transform: none;" alt="Artwork" />
+                    <div class="album-art-wrap ${previewPlaying ? 'is-playing' : ''} has-placeholder">
+                      <div id="art-placeholder"><img src="/logo.png" class="placeholder-logo" alt="Artwork" /></div>
                     </div>
                     <div class="player-details">
                       <div class="details-header">
@@ -307,33 +307,44 @@ window.addEventListener("DOMContentLoaded", () => {
 
             <div class="setting-row">
               <div class="setting-text">
-                <div class="setting-title">Background Blur Radius</div>
-                <div class="setting-desc">Adjust how soft and diffuse the ambient glow effect appears</div>
-              </div>
-              <div class="m3-slider-row">
-                <input type="range" class="m3-slider" id="slider-bg-blur" min="12" max="64" step="2" value="${cfg.island.bgBlurRadiusPx ?? 36}" />
-                <span class="m3-slider-value" id="val-bg-blur">${cfg.island.bgBlurRadiusPx ?? 36}px</span>
-              </div>
-            </div>
-
-            <div class="setting-row">
-              <div class="setting-text">
-                <div class="setting-title">Background Blur Opacity</div>
-                <div class="setting-desc">Control the intensity and brightness of the ambient background glow</div>
-              </div>
-              <div class="m3-slider-row">
-                <input type="range" class="m3-slider" id="slider-bg-blur-opacity" min="10" max="100" step="5" value="${cfg.island.bgBlurOpacity ?? 62}" />
-                <span class="m3-slider-value" id="val-bg-blur-opacity">${cfg.island.bgBlurOpacity ?? 62}%</span>
-              </div>
-            </div>
-
-            <div class="setting-row">
-              <div class="setting-text">
                 <div class="setting-title">Album Cover Background Blur</div>
                 <div class="setting-desc">Blur playing album cover in background, or keep pure theme color glow</div>
               </div>
               <div class="m3-switch ${cfg.island.albumCoverBgBlur !== false ? "active" : ""}" id="switch-album-cover-blur">
                 <div class="m3-switch-thumb"></div>
+              </div>
+            </div>
+
+            <div class="setting-row ${cfg.island.albumCoverBgBlur === false ? "disabled" : ""}" id="row-bg-blur-radius">
+              <div class="setting-text">
+                <div class="setting-title">Background Blur Radius</div>
+                <div class="setting-desc">Adjust how soft and diffuse the ambient glow effect appears</div>
+              </div>
+              <div class="m3-slider-row">
+                <input type="range" class="m3-slider" id="slider-bg-blur" min="12" max="64" step="2" value="${cfg.island.bgBlurRadiusPx ?? 36}" ${cfg.island.albumCoverBgBlur === false ? "disabled" : ""} />
+                <span class="m3-slider-value" id="val-bg-blur">${cfg.island.bgBlurRadiusPx ?? 36}px</span>
+              </div>
+            </div>
+
+            <div class="setting-row ${cfg.island.albumCoverBgBlur === false ? "disabled" : ""}" id="row-bg-blur-opacity">
+              <div class="setting-text">
+                <div class="setting-title">Background Blur Opacity</div>
+                <div class="setting-desc">Control the intensity and brightness of the ambient background glow</div>
+              </div>
+              <div class="m3-slider-row">
+                <input type="range" class="m3-slider" id="slider-bg-blur-opacity" min="10" max="100" step="5" value="${cfg.island.bgBlurOpacity ?? 62}" ${cfg.island.albumCoverBgBlur === false ? "disabled" : ""} />
+                <span class="m3-slider-value" id="val-bg-blur-opacity">${cfg.island.bgBlurOpacity ?? 62}%</span>
+              </div>
+            </div>
+
+            <div class="setting-row ${cfg.island.albumCoverBgBlur === false ? "disabled" : ""}" id="row-bg-blur-saturation">
+              <div class="setting-text">
+                <div class="setting-title">Background Blur Saturation</div>
+                <div class="setting-desc">Adjust the color richness and vibrancy of the blurred background</div>
+              </div>
+              <div class="m3-slider-row">
+                <input type="range" class="m3-slider" id="slider-bg-blur-saturation" min="100" max="300" step="10" value="${cfg.island.bgBlurSaturation ?? 200}" ${cfg.island.albumCoverBgBlur === false ? "disabled" : ""} />
+                <span class="m3-slider-value" id="val-bg-blur-saturation">${cfg.island.bgBlurSaturation ?? 200}%</span>
               </div>
             </div>
 
@@ -558,7 +569,7 @@ window.addEventListener("DOMContentLoaded", () => {
               <div class="setting-text">
                 <div class="setting-title">KitKat Version</div>
                 <div class="setting-desc">
-                  Installed: <strong class="version-tag">v${updateData?.current_version || "1.1.0"}</strong>
+                  Installed: <strong class="version-tag">v${updateData?.current_version || "1.2.0"}</strong>
                   ${updateStatus === "up-to-date" ? `<span class="update-status-pill success">Up to date</span>` : ""}
                   ${updateStatus === "available" ? `<span class="update-status-pill available">Update: ${escapeHtml(updateData?.latest_version || "")}</span>` : ""}
                   ${updateStatus === "checking" ? `<span class="update-status-pill checking">Checking...</span>` : ""}
@@ -708,6 +719,12 @@ window.addEventListener("DOMContentLoaded", () => {
         render();
       };
       previewTrack.addEventListener("click", handleScrub);
+      const thickSeekbar = previewTrack.querySelector(".thick-seekbar") as HTMLInputElement | null;
+      thickSeekbar?.addEventListener("input", (e) => {
+        e.stopPropagation();
+        previewScrubPercent = parseInt(thickSeekbar.value, 10);
+        render();
+      });
     }
 
     // Preview skip buttons
@@ -749,7 +766,8 @@ window.addEventListener("DOMContentLoaded", () => {
     sliderBlur?.addEventListener("input", () => {
       const val = parseInt(sliderBlur.value, 10);
       if (valBlur) valBlur.textContent = `${val}px`;
-      if (previewGlow) previewGlow.style.filter = `blur(${val}px) saturate(200%) brightness(1.22)`;
+      const currentSat = parseInt((document.getElementById("slider-bg-blur-saturation") as HTMLInputElement)?.value || `${cfg.island.bgBlurSaturation ?? 200}`, 10);
+      if (previewGlow) previewGlow.style.filter = `blur(${val}px) saturate(${currentSat}%) brightness(1.22)`;
       document.documentElement.style.setProperty("--kk-bg-blur", `${val}px`);
     });
     sliderBlur?.addEventListener("change", () => {
@@ -773,6 +791,21 @@ window.addEventListener("DOMContentLoaded", () => {
       commitUpdate({ ...cfg, island: { ...cfg.island, bgBlurOpacity: val } });
     });
 
+    // Background blur saturation slider
+    const sliderBlurSaturation = document.getElementById("slider-bg-blur-saturation") as HTMLInputElement | null;
+    const valBlurSaturation = document.getElementById("val-bg-blur-saturation");
+    sliderBlurSaturation?.addEventListener("input", () => {
+      const val = parseInt(sliderBlurSaturation.value, 10);
+      if (valBlurSaturation) valBlurSaturation.textContent = `${val}%`;
+      const currentRadius = parseInt((document.getElementById("slider-bg-blur") as HTMLInputElement)?.value || `${cfg.island.bgBlurRadiusPx ?? 36}`, 10);
+      if (previewGlow) previewGlow.style.filter = `blur(${currentRadius}px) saturate(${val}%) brightness(1.22)`;
+      document.documentElement.style.setProperty("--kk-bg-blur-saturation", `${val}%`);
+    });
+    sliderBlurSaturation?.addEventListener("change", () => {
+      const val = parseInt(sliderBlurSaturation.value, 10);
+      commitUpdate({ ...cfg, island: { ...cfg.island, bgBlurSaturation: val } });
+    });
+
     // Island drop shadow slider
     const sliderDropShadow = document.getElementById("slider-drop-shadow") as HTMLInputElement | null;
     const valDropShadow = document.getElementById("val-drop-shadow");
@@ -783,13 +816,27 @@ window.addEventListener("DOMContentLoaded", () => {
       const shadowAlpha = (val / 100).toFixed(2);
       const shadowBlur = Math.round((24 * val) / 85);
       const shadowY = Math.round((12 * val) / 85);
+      const shadowBlurPill = Math.round((18 * val) / 85);
+      const shadowYPill = Math.round((8 * val) / 85);
+      const shadowBlurHidden = Math.round((12 * val) / 85);
+      const shadowYHidden = Math.round((4 * val) / 85);
+
       const shadowCss = val === 0
         ? "none"
         : `0 ${shadowY}px ${shadowBlur}px -6px rgba(0, 0, 0, ${shadowAlpha})`;
+      const shadowCssPill = val === 0
+        ? "none"
+        : `0 ${shadowYPill}px ${shadowBlurPill}px -4px rgba(0, 0, 0, ${shadowAlpha})`;
+      const shadowCssHidden = val === 0
+        ? "none"
+        : `0 ${shadowYHidden}px ${shadowBlurHidden}px rgba(0, 0, 0, ${shadowAlpha})`;
+
       document.documentElement.style.setProperty("--kk-island-drop-shadow", shadowCss);
+      document.documentElement.style.setProperty("--kk-island-drop-shadow-pill", shadowCssPill);
+      document.documentElement.style.setProperty("--kk-island-drop-shadow-hidden", shadowCssHidden);
       document.documentElement.style.setProperty("--kk-drop-shadow-opacity", shadowAlpha);
       if (previewIslandEl) {
-        previewIslandEl.style.boxShadow = shadowCss;
+        previewIslandEl.style.boxShadow = previewMode === "pill" ? shadowCssPill : shadowCss;
       }
     });
     sliderDropShadow?.addEventListener("change", () => {

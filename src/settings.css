@@ -242,6 +242,10 @@ body {
   max-width: 270px;
   border-radius: 0 0 17px 17px;
   padding: 6px 12px;
+  box-shadow: var(
+    --kk-island-drop-shadow-pill,
+    0 8px 18px -4px rgba(0, 0, 0, 0.85)
+  );
 }
 
 .preview-island-mock.is-pill::after {
@@ -813,6 +817,17 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: 16px;
+  transition: opacity 0.25s ease, filter 0.25s ease;
+}
+
+.setting-row.disabled {
+  opacity: 0.38;
+  pointer-events: none;
+  filter: grayscale(0.5);
+}
+
+.setting-row.disabled * {
+  cursor: not-allowed !important;
 }
 
 .setting-text {
@@ -1406,6 +1421,20 @@ body {
 
 .m3-slider:active::-webkit-slider-thumb {
   transform: scale(0.95);
+}
+
+.m3-slider:disabled {
+  opacity: 0.45;
+  cursor: not-allowed !important;
+  pointer-events: none;
+  background: var(--kk-surface);
+}
+
+.m3-slider:disabled::-webkit-slider-thumb {
+  cursor: not-allowed !important;
+  box-shadow: none !important;
+  transform: none !important;
+  background: var(--kk-outline) !important;
 }
 
 .m3-slider-value {

@@ -65,6 +65,15 @@ pub async fn resolve_ytdlp_bin() -> Option<PathBuf> {
     None
 }
 
+async fn has_node_runtime() -> bool {
+    create_command("node")
+        .arg("--version")
+        .output()
+        .await
+        .map(|o| o.status.success())
+        .unwrap_or(false)
+}
+
 pub async fn check_status() -> Result<YtDlpStatus, String> {
     if let Some(path) = resolve_ytdlp_bin().await {
         if let Ok(output) = create_command(&path).arg("--version").output().await {
@@ -167,9 +176,15 @@ pub async fn search_tracks(query: String) -> Result<Vec<TrackMetadata>, String> 
         for entry in entries {
             let id = entry.get("id").and_then(|v| v.as_str()).unwrap_or("").to_string();
             if id.is_empty() { continue; }
+            let duration_secs = entry.get("duration").and_then(|v| v.as_u64());
+            let is_live = entry.get("is_live").and_then(|v| v.as_bool()).unwrap_or(false)
+                || entry.get("live_status").and_then(|v| v.as_str()).map(|s| s == "is_live").unwrap_or(false)
+                || duration_secs.unwrap_or(0) == 0;
+            if is_live {
+                continue;
+            }
             let title = entry.get("title").and_then(|v| v.as_str()).unwrap_or("Unknown").to_string();
             let uploader = entry.get("uploader").or_else(|| entry.get("channel")).and_then(|v| v.as_str()).unwrap_or("Unknown").to_string();
-            let duration_secs = entry.get("duration").and_then(|v| v.as_u64());
             let thumbnail_url = entry.get("thumbnails")
                 .and_then(|t| t.as_array())
                 .and_then(|arr| arr.last())
@@ -205,15 +220,24 @@ pub async fn extract_stream_url(video_id: String) -> Result<StreamPayload, Strin
         .ok_or_else(|| "yt-dlp is not installed".to_string())?;
 
     let url = format!("https://www.youtube.com/watch?v={}", vid);
-    let output = create_command(bin)
-        .args([
-            "-g",
-            "-f",
-            "ba[ext=m4a]/ba/b",
-            "--no-playlist",
-            "--no-warnings",
-            &url,
-        ])
+    let mut cmd = create_command(bin);
+    cmd.args([
+        "--extractor-args",
+        "youtube:player_client=android,web",
+        "-g",
+        "-f",
+        "ba[ext=m4a][protocol^=http]/ba[ext=webm][protocol^=http]/ba[protocol^=http]/ba/b",
+        "--no-playlist",
+        "--no-warnings",
+    ]);
+
+    if has_node_runtime().await {
+        cmd.args(["--js-runtimes", "node"]);
+    }
+
+    cmd.arg(&url);
+
+    let output = cmd
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
         .output()
@@ -233,6 +257,10 @@ pub async fn extract_stream_url(video_id: String) -> Result<StreamPayload, Strin
         .last()
         .ok_or_else(|| "No valid stream URL returned by yt-dlp".to_string())?
         .to_string();
+
+    if stream_url.ends_with(".m3u8") || stream_url.contains("/hls_playlist/") {
+        return Err("Live streams and HLS broadcasts are not supported".to_string());
+    }
 
     Ok(StreamPayload {
         stream_url,
