@@ -774,12 +774,12 @@ window.addEventListener("DOMContentLoaded", () => {
       const shadowBlur = Math.round((24 * val) / 85);
       const shadowY = Math.round((12 * val) / 85);
       const shadowCss = val === 0
-        ? "none"
+        ? "0 0 0 0 transparent"
         : `0 ${shadowY}px ${shadowBlur}px -6px rgba(0, 0, 0, ${shadowAlpha})`;
       document.documentElement.style.setProperty("--kk-island-drop-shadow", shadowCss);
       document.documentElement.style.setProperty("--kk-drop-shadow-opacity", shadowAlpha);
       if (previewIslandEl) {
-        previewIslandEl.style.boxShadow = shadowCss;
+        previewIslandEl.style.boxShadow = `0 7px 0 0 #050508, 0 8px 0 0 rgba(var(--kk-primary-rgb), 0.15), 0 16px 24px -2px rgba(var(--kk-primary-rgb), 0.22), ${shadowCss}`;
       }
     });
     sliderDropShadow?.addEventListener("change", () => {

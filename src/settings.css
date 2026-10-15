@@ -202,7 +202,7 @@ body {
 .preview-island-mock {
   width: 100%;
   max-width: var(--kk-preview-mock-width, 480px);
-  background: #000000;
+  background: #08080C;
   backdrop-filter: blur(28px) saturate(210%);
   -webkit-backdrop-filter: blur(28px) saturate(210%);
   border: none;
@@ -211,31 +211,36 @@ body {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  box-shadow: var(
-    --kk-island-drop-shadow,
-    0 12px 24px -6px rgba(0, 0, 0, 0.85)
-  );
+  box-shadow: 
+    0 7px 0 0 #050508,
+    0 8px 0 0 rgba(var(--kk-primary-rgb, 74, 222, 128), 0.15),
+    0 16px 24px -2px rgba(var(--kk-primary-rgb, 74, 222, 128), 0.22),
+    var(--kk-island-drop-shadow, 0 12px 24px -6px rgba(0, 0, 0, 0.85));
   transition: all 0.25s cubic-bezier(0.2, 0, 0, 1);
   position: relative;
 }
 
+/* 3D Backlit Horizon Cradle Glow - Specular Bottom Rim */
 .preview-island-mock::after {
   content: "";
   position: absolute;
   inset: 0;
-  border-left: 1px solid rgba(255, 255, 255, 0.22);
-  border-right: 1px solid rgba(255, 255, 255, 0.22);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.26);
-  border-top: none;
   border-radius: inherit;
   pointer-events: none;
   z-index: 5;
-  box-shadow: 
-    inset 1px 0 0 0 rgba(255, 255, 255, 0.14),
-    inset -1px 0 0 0 rgba(255, 255, 255, 0.14),
-    inset 0 -1px 0 0 rgba(255, 255, 255, 0.26);
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.25) 20px, rgba(0, 0, 0, 0.8) 50px, black 85px);
-  mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.25) 20px, rgba(0, 0, 0, 0.8) 50px, black 85px);
+  box-sizing: border-box;
+  padding: 0 1.5px 1.5px 1.5px;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.05) 0%,
+    rgba(255, 255, 255, 0.08) 50%,
+    var(--kk-rim-specular, color-mix(in srgb, #ffffff 85%, var(--kk-primary))) 100%
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  box-shadow: inset 0 -1.5px 0 0 var(--kk-rim-specular, color-mix(in srgb, #ffffff 85%, var(--kk-primary)));
 }
 
 .preview-island-mock.is-pill {
@@ -245,8 +250,7 @@ body {
 }
 
 .preview-island-mock.is-pill::after {
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.4) 10px, black 26px);
-  mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.4) 10px, black 26px);
+  padding: 0 1.5px 1.5px 1.5px;
 }
 
 /* Pill Mock Details */

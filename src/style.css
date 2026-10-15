@@ -74,16 +74,17 @@ body {
 .island {
   position: absolute;
   top: 0;
-  background: #000000;
+  background: #08080C;
   border: none;
   border-top-left-radius: 0 !important;
   border-top-right-radius: 0 !important;
   border-bottom-left-radius: 28px;
   border-bottom-right-radius: 28px;
-  box-shadow: var(
-    --kk-island-drop-shadow,
-    0 12px 24px -6px rgba(0, 0, 0, 0.85)
-  );
+  box-shadow: 
+    0 7px 0 0 #050508,
+    0 8px 0 0 rgba(var(--kk-primary-rgb, 74, 222, 128), 0.15),
+    0 16px 24px -2px rgba(var(--kk-primary-rgb, 74, 222, 128), 0.22),
+    var(--kk-island-drop-shadow, 0 12px 24px -6px rgba(0, 0, 0, 0.85));
   pointer-events: auto;
   overflow: hidden;
   transform-origin: top center;
@@ -92,35 +93,35 @@ body {
   flex-direction: column;
 }
 
-/* Disappearing Glass Perimeter Border Vessel */
+/* 3D Backlit Horizon Cradle Glow - Specular Bottom Rim (Inner Stroke) */
 .island::after {
   content: "";
   position: absolute;
   inset: 0;
-  border-left: 1px solid rgba(255, 255, 255, 0.22);
-  border-right: 1px solid rgba(255, 255, 255, 0.22);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.26);
-  border-top: none;
   border-radius: inherit;
   pointer-events: none;
   z-index: 5;
-  box-shadow: 
-    inset 1px 0 0 0 rgba(255, 255, 255, 0.14),
-    inset -1px 0 0 0 rgba(255, 255, 255, 0.14),
-    inset 0 -1px 0 0 rgba(255, 255, 255, 0.26);
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.25) 20px, rgba(0, 0, 0, 0.8) 50px, black 85px);
-  mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.25) 20px, rgba(0, 0, 0, 0.8) 50px, black 85px);
+  box-sizing: border-box;
+  padding: 0 1.5px 1.5px 1.5px;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.05) 0%,
+    rgba(255, 255, 255, 0.08) 50%,
+    var(--kk-rim-specular, color-mix(in srgb, #ffffff 85%, var(--kk-primary))) 100%
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  box-shadow: inset 0 -1.5px 0 0 var(--kk-rim-specular, color-mix(in srgb, #ffffff 85%, var(--kk-primary)));
 }
 
 .island.state-pill::after {
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.4) 10px, black 26px);
-  mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.4) 10px, black 26px);
+  padding: 0 1.5px 1.5px 1.5px;
 }
 
 .island.state-hidden::after {
-  -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.15) 0%, black 6px);
-  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.15) 0%, black 6px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.35);
+  border-bottom: 1px solid var(--kk-rim-specular, color-mix(in srgb, #ffffff 85%, var(--kk-primary)));
 }
 
 /* Dynamic Ambient Glow Bleed Layer */
@@ -138,25 +139,19 @@ body {
   mix-blend-mode: screen;
 }
 
-/* Luminous atmospheric radial bloom gradient vessel (Half-Eclipse Bottom Horizon) */
+/* 3D Backlit Horizon Cradle Glow - Horizon Radial Emitter (Clipped Inside) */
 .island::before {
   content: "";
   position: absolute;
   inset: 0;
-  background-image: 
-    radial-gradient(
-      ellipse 95% 75% at 50% 112%,
-      var(--kk-glow-core, rgba(74, 222, 128, 0.54)) 0%,
-      var(--kk-glow-mid, rgba(74, 222, 128, 0.22)) 38%,
-      var(--kk-glow-subtle, rgba(74, 222, 128, 0.06)) 64%,
-      transparent 82%
-    ),
-    radial-gradient(
-      ellipse 130% 90% at 50% 122%,
-      var(--kk-glow-mid, rgba(74, 222, 128, 0.18)) 0%,
-      var(--kk-glow-subtle, rgba(74, 222, 128, 0.05)) 48%,
-      transparent 78%
-    );
+  background-image: radial-gradient(
+    ellipse 110% 60% at 50% 112%,
+    var(--kk-cradle-core, color-mix(in srgb, color-mix(in srgb, #ffffff 80%, var(--kk-primary)) 90%, transparent)) 0%,
+    var(--kk-cradle-core, color-mix(in srgb, color-mix(in srgb, #ffffff 80%, var(--kk-primary)) 90%, transparent)) 10%,
+    rgba(var(--kk-primary-rgb, 74, 222, 128), 0.65) 25%,
+    transparent 60%,
+    transparent 100%
+  );
   pointer-events: none;
   z-index: 0;
   border-radius: inherit;
@@ -245,16 +240,20 @@ body {
   cursor: pointer;
   border: none;
   box-shadow: 
-    0 8px 18px -4px rgba(0, 0, 0, 0.85),
-    0 0 14px -2px var(--kk-glow-halo, rgba(74, 222, 128, 0.28));
+    0 5px 0 0 #050508,
+    0 6px 0 0 rgba(var(--kk-primary-rgb, 74, 222, 128), 0.15),
+    0 12px 20px -2px rgba(var(--kk-primary-rgb, 74, 222, 128), 0.22),
+    var(--kk-island-drop-shadow, 0 8px 18px -4px rgba(0, 0, 0, 0.85));
 }
 
 .island.state-pill::before {
   background-image: radial-gradient(
-    ellipse 100% 120% at 50% 130%,
-    var(--kk-glow-core, rgba(74, 222, 128, 0.54)) 0%,
-    var(--kk-glow-mid, rgba(74, 222, 128, 0.20)) 45%,
-    transparent 85%
+    ellipse 110% 80% at 50% 115%,
+    var(--kk-cradle-core, color-mix(in srgb, color-mix(in srgb, #ffffff 80%, var(--kk-primary)) 90%, transparent)) 0%,
+    var(--kk-cradle-core, color-mix(in srgb, color-mix(in srgb, #ffffff 80%, var(--kk-primary)) 90%, transparent)) 10%,
+    rgba(var(--kk-primary-rgb, 74, 222, 128), 0.65) 25%,
+    transparent 60%,
+    transparent 100%
   );
 }
 

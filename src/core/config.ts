@@ -237,6 +237,19 @@ export function applyThemeToDOM(cfg: AppConfig, root: HTMLElement = document.doc
   root.style.setProperty("--kk-glow-subtle", `rgba(${rgb}, 0.06)`);
   root.style.setProperty("--kk-glow-halo", `rgba(${rgb}, 0.34)`);
 
+  // 3D Backlit Horizon Cradle Glow - Hot Core (80% white mix with #FFFFFF, 90% opacity)
+  const [r, g, b] = rgb.split(",").map((v) => parseInt(v.trim(), 10));
+  const rCore = Math.round(255 * 0.8 + r * 0.2);
+  const gCore = Math.round(255 * 0.8 + g * 0.2);
+  const bCore = Math.round(255 * 0.8 + b * 0.2);
+  root.style.setProperty("--kk-cradle-core", `rgba(${rCore}, ${gCore}, ${bCore}, 0.90)`);
+
+  // Specular Bottom Rim - #FFFFFF/85% mixed with [ACCENT]
+  const rRim = Math.round(255 * 0.85 + r * 0.15);
+  const gRim = Math.round(255 * 0.85 + g * 0.15);
+  const bRim = Math.round(255 * 0.85 + b * 0.15);
+  root.style.setProperty("--kk-rim-specular", `rgba(${rRim}, ${gRim}, ${bRim}, 0.95)`);
+
   root.style.setProperty("--kk-primary", accent.primary);
   root.style.setProperty("--kk-primary-hover", accent.hover);
   root.style.setProperty("--kk-primary-active", accent.active);
@@ -267,7 +280,7 @@ export function applyThemeToDOM(cfg: AppConfig, root: HTMLElement = document.doc
   root.style.setProperty(
     "--kk-island-drop-shadow",
     shadowPercent === 0
-      ? "none"
+      ? "0 0 0 0 transparent"
       : `0 ${shadowY}px ${shadowBlur}px -6px rgba(0, 0, 0, ${shadowAlpha})`
   );
 
