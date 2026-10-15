@@ -548,7 +548,7 @@ window.addEventListener("DOMContentLoaded", () => {
               <div class="setting-text">
                 <div class="setting-title">KitKat Version</div>
                 <div class="setting-desc">
-                  Installed: <strong class="version-tag">v${updateData?.current_version || "1.0.0"}</strong>
+                  Installed: <strong class="version-tag">v${updateData?.current_version || "1.1.0"}</strong>
                   ${updateStatus === "up-to-date" ? `<span class="update-status-pill success">Up to date</span>` : ""}
                   ${updateStatus === "available" ? `<span class="update-status-pill available">Update: ${escapeHtml(updateData?.latest_version || "")}</span>` : ""}
                   ${updateStatus === "checking" ? `<span class="update-status-pill checking">Checking...</span>` : ""}
@@ -774,8 +774,8 @@ window.addEventListener("DOMContentLoaded", () => {
       const shadowBlur = Math.round((24 * val) / 85);
       const shadowY = Math.round((12 * val) / 85);
       const shadowCss = val === 0
-        ? `0 0 18px -2px var(--kk-glow-halo, rgba(74, 222, 128, 0.28))`
-        : `0 ${shadowY}px ${shadowBlur}px -6px rgba(0, 0, 0, ${shadowAlpha}), 0 0 18px -2px var(--kk-glow-halo, rgba(74, 222, 128, 0.28))`;
+        ? "none"
+        : `0 ${shadowY}px ${shadowBlur}px -6px rgba(0, 0, 0, ${shadowAlpha})`;
       document.documentElement.style.setProperty("--kk-island-drop-shadow", shadowCss);
       document.documentElement.style.setProperty("--kk-drop-shadow-opacity", shadowAlpha);
       if (previewIslandEl) {

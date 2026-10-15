@@ -267,8 +267,8 @@ export function applyThemeToDOM(cfg: AppConfig, root: HTMLElement = document.doc
   root.style.setProperty(
     "--kk-island-drop-shadow",
     shadowPercent === 0
-      ? `0 0 18px -2px var(--kk-glow-halo, rgba(74, 222, 128, 0.28))`
-      : `0 ${shadowY}px ${shadowBlur}px -6px rgba(0, 0, 0, ${shadowAlpha}), 0 0 18px -2px var(--kk-glow-halo, rgba(74, 222, 128, 0.28))`
+      ? "none"
+      : `0 ${shadowY}px ${shadowBlur}px -6px rgba(0, 0, 0, ${shadowAlpha})`
   );
 
   if (cfg.seekbar.showHoverGlow) {
