@@ -36,6 +36,7 @@ export interface IslandConfigCustom {
   autoCheckUpdates: boolean;
   bgBlurRadiusPx: number;
   bgBlurOpacity: number;
+  dropShadow: number;
 }
 
 export interface AppConfig {
@@ -180,6 +181,7 @@ export const DEFAULT_CONFIG: AppConfig = {
     autoCheckUpdates: true,
     bgBlurRadiusPx: 36,
     bgBlurOpacity: 62,
+    dropShadow: 85,
   },
 };
 
@@ -256,6 +258,18 @@ export function applyThemeToDOM(cfg: AppConfig, root: HTMLElement = document.doc
   root.style.setProperty("--kk-bg-blur", `${blurPx}px`);
   root.style.setProperty("--kk-bg-blur-opacity", `${blurOpacity}`);
   root.style.setProperty("--kk-bg-blur-opacity-pill", `${Math.round(blurOpacity * 0.7 * 100) / 100}`);
+
+  const shadowPercent = cfg?.island?.dropShadow ?? 85;
+  const shadowAlpha = (shadowPercent / 100).toFixed(2);
+  const shadowBlur = Math.round((24 * shadowPercent) / 85);
+  const shadowY = Math.round((12 * shadowPercent) / 85);
+  root.style.setProperty("--kk-drop-shadow-opacity", shadowAlpha);
+  root.style.setProperty(
+    "--kk-island-drop-shadow",
+    shadowPercent === 0
+      ? `0 0 18px -2px var(--kk-glow-halo, rgba(74, 222, 128, 0.28))`
+      : `0 ${shadowY}px ${shadowBlur}px -6px rgba(0, 0, 0, ${shadowAlpha}), 0 0 18px -2px var(--kk-glow-halo, rgba(74, 222, 128, 0.28))`
+  );
 
   if (cfg.seekbar.showHoverGlow) {
     root.style.setProperty("--kk-seekbar-glow", `0 0 6px -1px rgba(${rgb}, 0.35)`);

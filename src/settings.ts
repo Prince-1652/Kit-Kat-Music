@@ -326,6 +326,17 @@ window.addEventListener("DOMContentLoaded", () => {
                 <span class="m3-slider-value" id="val-bg-blur-opacity">${cfg.island.bgBlurOpacity ?? 62}%</span>
               </div>
             </div>
+
+            <div class="setting-row">
+              <div class="setting-text">
+                <div class="setting-title">Island Drop Shadow</div>
+                <div class="setting-desc">Adjust the depth and intensity of the shadow cast by the island</div>
+              </div>
+              <div class="m3-slider-row">
+                <input type="range" class="m3-slider" id="slider-drop-shadow" min="0" max="100" step="5" value="${cfg.island.dropShadow ?? 85}" />
+                <span class="m3-slider-value" id="val-drop-shadow">${cfg.island.dropShadow ?? 85}%</span>
+              </div>
+            </div>
           </div>
         </section>
 
@@ -750,6 +761,30 @@ window.addEventListener("DOMContentLoaded", () => {
     sliderBlurOpacity?.addEventListener("change", () => {
       const val = parseInt(sliderBlurOpacity.value, 10);
       commitUpdate({ ...cfg, island: { ...cfg.island, bgBlurOpacity: val } });
+    });
+
+    // Island drop shadow slider
+    const sliderDropShadow = document.getElementById("slider-drop-shadow") as HTMLInputElement | null;
+    const valDropShadow = document.getElementById("val-drop-shadow");
+    const previewIslandEl = document.getElementById("preview-island") as HTMLElement | null;
+    sliderDropShadow?.addEventListener("input", () => {
+      const val = parseInt(sliderDropShadow.value, 10);
+      if (valDropShadow) valDropShadow.textContent = `${val}%`;
+      const shadowAlpha = (val / 100).toFixed(2);
+      const shadowBlur = Math.round((24 * val) / 85);
+      const shadowY = Math.round((12 * val) / 85);
+      const shadowCss = val === 0
+        ? `0 0 18px -2px var(--kk-glow-halo, rgba(74, 222, 128, 0.28))`
+        : `0 ${shadowY}px ${shadowBlur}px -6px rgba(0, 0, 0, ${shadowAlpha}), 0 0 18px -2px var(--kk-glow-halo, rgba(74, 222, 128, 0.28))`;
+      document.documentElement.style.setProperty("--kk-island-drop-shadow", shadowCss);
+      document.documentElement.style.setProperty("--kk-drop-shadow-opacity", shadowAlpha);
+      if (previewIslandEl) {
+        previewIslandEl.style.boxShadow = shadowCss;
+      }
+    });
+    sliderDropShadow?.addEventListener("change", () => {
+      const val = parseInt(sliderDropShadow.value, 10);
+      commitUpdate({ ...cfg, island: { ...cfg.island, dropShadow: val } });
     });
 
     // Seekbar style (responsive segmented / select)
