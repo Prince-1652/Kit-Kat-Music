@@ -132,17 +132,30 @@ export class SearchManager {
       }
 
       container.innerHTML = tracks
-        .map(
-          (t) => `
+        .map((t) => {
+          const duration = this.formatDuration(t.duration_secs);
+          return `
         <div class="search-item" data-id="${this.escapeHtml(t.id)}">
-          <img src="${this.escapeHtml(t.thumbnail_url || "")}" class="search-thumb" alt="" />
+          <div class="search-thumb-wrap">
+            <img src="${this.escapeHtml(t.thumbnail_url || "")}" class="search-thumb" alt="" />
+            <div class="search-thumb-fallback">${renderIcon("music")}</div>
+            <div class="search-thumb-play-overlay">
+              ${renderIcon("play")}
+            </div>
+          </div>
           <div class="search-meta">
-            <div class="search-title">${this.escapeHtml(t.title)}</div>
+            <div class="search-title" title="${this.escapeHtml(t.title)}">${this.escapeHtml(t.title)}</div>
             <div class="search-artist">${this.escapeHtml(t.uploader)}</div>
           </div>
+          <div class="search-trailing">
+            ${duration ? `<span class="search-duration">${duration}</span>` : ""}
+            <div class="search-play-indicator" title="Play">
+              ${renderIcon("play")}
+            </div>
+          </div>
         </div>
-      `
-        )
+      `;
+        })
         .join("");
 
       container.querySelectorAll<HTMLImageElement>(".search-thumb").forEach((img) => {
@@ -169,6 +182,13 @@ export class SearchManager {
         `;
       }
     }
+  }
+
+  private formatDuration(secs?: number): string {
+    if (!secs || isNaN(secs) || secs <= 0) return "";
+    const m = Math.floor(secs / 60);
+    const s = Math.floor(secs % 60);
+    return `${m}:${s.toString().padStart(2, "0")}`;
   }
 
   private escapeHtml(str: string): string {

@@ -222,18 +222,19 @@ body {
   content: "";
   position: absolute;
   inset: 0;
-  border-left: 1px solid rgba(255, 255, 255, 0.05);
-  border-right: 1px solid rgba(255, 255, 255, 0.05);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.32);
+  border-left: 1px solid rgba(255, 255, 255, 0.22);
+  border-right: 1px solid rgba(255, 255, 255, 0.22);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.26);
   border-top: none;
   border-radius: inherit;
   pointer-events: none;
   z-index: 5;
   box-shadow: 
-    inset 0 -1px 0 0 rgba(255, 255, 255, 0.28),
-    inset 0 -3px 8px 0 rgba(255, 255, 255, 0.06);
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.12) 40px, rgba(0, 0, 0, 0.5) 85px, black 115px);
-  mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.12) 40px, rgba(0, 0, 0, 0.5) 85px, black 115px);
+    inset 1px 0 0 0 rgba(255, 255, 255, 0.14),
+    inset -1px 0 0 0 rgba(255, 255, 255, 0.14),
+    inset 0 -1px 0 0 rgba(255, 255, 255, 0.26);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.25) 20px, rgba(0, 0, 0, 0.8) 50px, black 85px);
+  mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.25) 20px, rgba(0, 0, 0, 0.8) 50px, black 85px);
 }
 
 .preview-island-mock.is-pill {
