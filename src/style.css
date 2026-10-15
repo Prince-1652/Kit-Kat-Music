@@ -96,24 +96,23 @@ body {
   content: "";
   position: absolute;
   inset: 0;
-  border-left: 1px solid rgba(255, 255, 255, 0.22);
-  border-right: 1px solid rgba(255, 255, 255, 0.22);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.26);
+  border-left: 1px solid rgba(255, 255, 255, 0.05);
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.32);
   border-top: none;
   border-radius: inherit;
   pointer-events: none;
   z-index: 5;
   box-shadow: 
-    inset 1px 0 0 0 rgba(255, 255, 255, 0.14),
-    inset -1px 0 0 0 rgba(255, 255, 255, 0.14),
-    inset 0 -1px 0 0 rgba(255, 255, 255, 0.26);
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.25) 20px, rgba(0, 0, 0, 0.8) 50px, black 85px);
-  mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.25) 20px, rgba(0, 0, 0, 0.8) 50px, black 85px);
+    inset 0 -1px 0 0 rgba(255, 255, 255, 0.28),
+    inset 0 -3px 8px 0 rgba(255, 255, 255, 0.06);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.12) 40px, rgba(0, 0, 0, 0.5) 85px, black 115px);
+  mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.12) 40px, rgba(0, 0, 0, 0.5) 85px, black 115px);
 }
 
 .island.state-pill::after {
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.4) 10px, black 26px);
-  mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.4) 10px, black 26px);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.2) 14px, black 28px);
+  mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.2) 14px, black 28px);
 }
 
 .island.state-hidden::after {
@@ -137,24 +136,24 @@ body {
   mix-blend-mode: screen;
 }
 
-/* Luminous atmospheric radial bloom gradient vessel */
+/* Luminous atmospheric radial bloom gradient vessel (Half-Eclipse Bottom Horizon) */
 .island::before {
   content: "";
   position: absolute;
   inset: 0;
   background-image: 
     radial-gradient(
-      110% 120% at 80% 100%,
-      var(--kk-glow-core, rgba(74, 222, 128, 0.48)) 0%,
-      var(--kk-glow-mid, rgba(74, 222, 128, 0.18)) 38%,
-      var(--kk-glow-subtle, rgba(74, 222, 128, 0.05)) 65%,
-      transparent 85%
+      ellipse 95% 75% at 50% 112%,
+      var(--kk-glow-core, rgba(74, 222, 128, 0.54)) 0%,
+      var(--kk-glow-mid, rgba(74, 222, 128, 0.22)) 38%,
+      var(--kk-glow-subtle, rgba(74, 222, 128, 0.06)) 64%,
+      transparent 82%
     ),
     radial-gradient(
-      70% 85% at 12% 45%,
-      var(--kk-glow-mid, rgba(74, 222, 128, 0.16)) 0%,
-      var(--kk-glow-subtle, rgba(74, 222, 128, 0.04)) 45%,
-      transparent 70%
+      ellipse 130% 90% at 50% 122%,
+      var(--kk-glow-mid, rgba(74, 222, 128, 0.18)) 0%,
+      var(--kk-glow-subtle, rgba(74, 222, 128, 0.05)) 48%,
+      transparent 78%
     );
   pointer-events: none;
   z-index: 0;
@@ -250,10 +249,10 @@ body {
 
 .island.state-pill::before {
   background-image: radial-gradient(
-    140% 160% at 85% 50%,
-    var(--kk-glow-core, rgba(74, 222, 128, 0.52)) 0%,
+    ellipse 100% 120% at 50% 130%,
+    var(--kk-glow-core, rgba(74, 222, 128, 0.54)) 0%,
     var(--kk-glow-mid, rgba(74, 222, 128, 0.20)) 45%,
-    transparent 80%
+    transparent 85%
   );
 }
 
