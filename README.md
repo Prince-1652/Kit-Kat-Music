@@ -183,4 +183,3 @@ Kit-Kat-Music/
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
-Distributed freely for personal and community use.
